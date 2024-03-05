@@ -17,7 +17,7 @@ router.beforeEach(async(to, from, next) => {
   // set page title
   document.title = getPageTitle(to.meta.title)
 
-  // determine whether the user has logged in
+  // determine whether the BigScreen has logged in
   const hasToken = getToken()
 
   if (hasToken) {
@@ -31,7 +31,7 @@ router.beforeEach(async(to, from, next) => {
         next()
       } else {
         try {
-          // get user info
+          // get BigScreen info
           const data = await store.dispatch('user/getInfo')
           console.log('获取到的data: ', data)
           const roles = data.data[0].roles

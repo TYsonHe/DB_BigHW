@@ -29,7 +29,7 @@ const mutations = {
 }
 
 const actions = {
-  // user login
+  // BigScreen login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
@@ -45,7 +45,7 @@ const actions = {
     })
   },
 
-  // get user info
+  // get BigScreen info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
@@ -69,7 +69,7 @@ const actions = {
     })
   },
 
-  // user logout
+  // BigScreen logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       removeToken() // must remove  token  first

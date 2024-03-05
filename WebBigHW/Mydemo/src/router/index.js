@@ -17,7 +17,7 @@ import Layout from '@/layout'
  * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
  * name:'router-name'             the name is used by <keep-alive> (must set!!!)
  * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
+    roles: ['UserManagement','editor']    control the page roles (you can set multiple roles)
     title: 'title'               the name show in sidebar and breadcrumb (recommend set)
     icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
     breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
@@ -251,7 +251,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'test for roles',
-        component: () => import('@/views/admin/index'),
+        component: () => import('@/views/UserManagement/index'),
         meta: { title: '用户管理', icon: 'form', roles: ['admin'] }
       }
     ]
@@ -263,7 +263,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'test for roles',
-        component: () => import('@/views/user/index'),
+        component: () => import('@/views/BigScreen/index'),
         meta: { title: '用户看到的', icon: 'form', roles: ['user'] }
       }
     ]

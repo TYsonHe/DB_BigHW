@@ -24,7 +24,7 @@ const users = {
 }
 
 module.exports = [
-  // user login
+  // BigScreen login
   {
     url: '/vue-admin-template/user/login',
     type: 'post',
@@ -47,7 +47,7 @@ module.exports = [
     }
   },
 
-  // get user info
+  // get BigScreen info
   {
     url: '/vue-admin-template/user/info\.*',
     type: 'get',
@@ -59,7 +59,7 @@ module.exports = [
       if (!info) {
         return {
           code: 50008,
-          message: 'Login failed, unable to get user details.'
+          message: 'Login failed, unable to get BigScreen details.'
         }
       }
 
@@ -70,7 +70,7 @@ module.exports = [
     }
   },
 
-  // user logout
+  // BigScreen logout
   {
     url: '/vue-admin-template/user/logout',
     type: 'post',

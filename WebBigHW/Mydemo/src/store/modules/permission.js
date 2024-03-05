@@ -1,7 +1,7 @@
 import { asyncRoutes, constantRoutes } from '@/router'
 
 /**
- * Use meta.role to determine if the current user has permission
+ * Use meta.role to determine if the current BigScreen has permission
  * @param roles
  * @param route
  */
