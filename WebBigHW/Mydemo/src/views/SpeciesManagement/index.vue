@@ -44,7 +44,6 @@
             prop="description"
             label="物种描述"
             align="center"
-            width="200"
           />
         </el-table>
       </el-card>
@@ -55,6 +54,7 @@
       title="新增"
       :visible.sync="addDialogVisible"
       width="30%"
+      @close="addFormClose"
     >
       <el-form ref="addRuleForm" :model="addSpeciesForm" label-width="90px">
         <el-form-item label="物种名">
@@ -66,8 +66,7 @@
             type="textarea"
             :rows="2"
             placeholder="请输入物种描述"
-          >
-          </el-input>
+          />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -81,6 +80,7 @@
       title="修改"
       :visible.sync="updateDialogVisible"
       width="30%"
+      @close="updateFormClose"
     >
       <el-form ref="updateRuleForm" :model="updateSpeciesForm" label-width="90px">
         <el-form-item label="物种id" prop="species_id">
@@ -212,6 +212,22 @@ export default {
       }).catch(() => {
         return false
       })
+    },
+    addFormClose() {
+      this.$refs.addRuleForm.resetFields()
+      this.addSpeciesForm = {
+        species_name: '',
+        description: ''
+      }
+    },
+    // 修改弹窗关闭回调事件
+    updateFormClose() {
+      this.$refs.updateRuleForm.resetFields()
+      this.updateSpeciesForm = {
+        species_id: '',
+        species_name: '',
+        description: ''
+      }
     }
   }// end of methods
 }

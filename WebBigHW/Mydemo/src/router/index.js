@@ -36,7 +36,6 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
@@ -52,6 +51,17 @@ export const constantRoutes = [
       name: '主页控制板',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '主页', icon: '主页' }
+    }]
+  },
+  {
+    path: '/species_management',
+    component: Layout,
+    redirect: '/species_management',
+    children: [{
+      path: 'index',
+      name: '物种管理',
+      component: () => import('@/views/SpeciesManagement/index'),
+      meta: { title: '物种管理', icon: '物种管理' }
     }]
   },
   // {

@@ -64,6 +64,7 @@
       title="新增"
       :visible.sync="addDialogVisible"
       width="30%"
+      @close="addFormClose"
     >
       <el-form ref="addRuleForm" :model="addUserForm" label-width="90px">
         <el-form-item label="用户名">
@@ -90,6 +91,7 @@
       title="修改"
       :visible.sync="updateDialogVisible"
       width="30%"
+      @close="updateFormClose"
     >
       <el-form ref="updateRuleForm" :model="updateUserForm" label-width="90px">
         <el-form-item label="用户id" prop="user_id">
@@ -239,6 +241,26 @@ export default {
       }).catch(() => {
         return false
       })
+    },
+    addFormClose() {
+      this.$refs.addRuleForm.resetFields()
+      this.addUserForm = {
+        user_name: '',
+        password: '',
+        roles: '',
+        station_id: ''
+      }
+    },
+    // 修改弹窗关闭回调事件
+    updateFormClose() {
+      this.$refs.updateRuleForm.resetFields()
+      this.updateUserForm = {
+        user_id: '',
+        user_name: '',
+        password: '',
+        roles: '',
+        station_id: ''
+      }
     }
   }// end of methods
 }
