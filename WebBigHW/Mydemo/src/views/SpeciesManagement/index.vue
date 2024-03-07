@@ -1,11 +1,11 @@
-<!--用户管理页面 admin专属-->
+<!--物种管理页面-->
 <template>
   <el-row>
     <el-col :span="24">
       <el-card class="box-card">
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
-            <el-input v-model="query.name" placeholder="请输入用户名" clearable>
+            <el-input v-model="query.name" placeholder="请输入物种名" clearable>
               <el-button slot="append" icon="el-icon-search" @click="queryBtn" />
             </el-input>
           </el-col>
@@ -20,8 +20,8 @@
         </el-row>
         <!--展示表格-->
         <el-table
-          ref="userTable"
-          :data="userList"
+          ref="speciesTable"
+          :data="speciesList"
           border
           stripe
           style="width: 100%"
@@ -31,29 +31,20 @@
             width="55"
           />
           <el-table-column
-            prop="user_id"
-            label="用户id"
+            prop="species_id"
+            label="物种id"
             align="center"
           />
           <el-table-column
-            prop="user_name"
-            label="用户名"
+            prop="species_name"
+            label="物种名"
             align="center"
           />
           <el-table-column
-            prop="password"
-            label="密码"
+            prop="description"
+            label="物种描述"
             align="center"
-          />
-          <el-table-column
-            prop="roles"
-            label="身份"
-            align="center"
-          />
-          <el-table-column
-            prop="station_id"
-            label="观测站id"
-            align="center"
+            width="200"
           />
         </el-table>
       </el-card>
@@ -65,18 +56,18 @@
       :visible.sync="addDialogVisible"
       width="30%"
     >
-      <el-form ref="addRuleForm" :model="addUserForm" label-width="90px">
-        <el-form-item label="用户名">
-          <el-input v-model="addUserForm.user_name" />
+      <el-form ref="addRuleForm" :model="addSpeciesForm" label-width="90px">
+        <el-form-item label="物种名">
+          <el-input v-model="addSpeciesForm.species_name" />
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="addUserForm.password" />
-        </el-form-item>
-        <el-form-item label="权限">
-          <el-input v-model="addUserForm.roles" />
-        </el-form-item>
-        <el-form-item label="观测站id">
-          <el-input v-model="addUserForm.station_id" />
+        <el-form-item label="物种描述">
+          <el-input
+            v-model="addSpeciesForm.description"
+            type="textarea"
+            :rows="2"
+            placeholder="请输入物种描述"
+          >
+          </el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -91,21 +82,15 @@
       :visible.sync="updateDialogVisible"
       width="30%"
     >
-      <el-form ref="updateRuleForm" :model="updateUserForm" label-width="90px">
-        <el-form-item label="用户id" prop="user_id">
-          <el-input v-model="updateUserForm.user_id" disabled />
+      <el-form ref="updateRuleForm" :model="updateSpeciesForm" label-width="90px">
+        <el-form-item label="物种id" prop="species_id">
+          <el-input v-model="updateSpeciesForm.species_id" disabled />
         </el-form-item>
-        <el-form-item label="用户名" prop="user_name">
-          <el-input v-model="updateUserForm.user_name" />
+        <el-form-item label="物种名" prop="species_name">
+          <el-input v-model="updateSpeciesForm.species_name" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="updateUserForm.password" />
-        </el-form-item>
-        <el-form-item label="权限" prop="roles">
-          <el-input v-model="updateUserForm.roles" />
-        </el-form-item>
-        <el-form-item label="观测站id" prop="station_id">
-          <el-input v-model="updateUserForm.station_id" />
+        <el-form-item label="物种描述" prop="description">
+          <el-input v-model="updateSpeciesForm.description" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -117,10 +102,9 @@
 </template>
 
 <script>
-import { getAllUsers, addUser, updateUser, deleteUser } from '@/api/user_management/user_management'
-
+import { getAllSpecies, addSpecies, updateSpecies, deleteSpecies } from '@/api/species_management/species_management'
 export default {
-  name: 'SysUser',
+  name: 'SysSpecies',
   data() {
     return {
       query: {
@@ -129,50 +113,46 @@ export default {
         name: ''
       },
       addDialogVisible: false,
-      addUserForm: {
-        user_name: '',
-        password: '',
-        roles: '',
-        station_id: ''
+      addSpeciesForm: {
+        species_name: '',
+        description: ''
       },
       updateDialogVisible: false,
-      updateUserForm: {
-        user_id: '',
-        user_name: '',
-        password: '',
-        roles: '',
-        station_id: ''
+      updateSpeciesForm: {
+        species_id: '',
+        species_name: '',
+        description: ''
       },
-      userList: []
+      speciesList: []
     }
   },
   created() {
-    this.getUserList()
+    this.getSpeciesList()
   },
   methods: {
-    async getUserList() {
-      await getAllUsers().then(response => {
+    async getSpeciesList() {
+      await getAllSpecies().then(response => {
         console.log(response)
-        this.userList = response.data
+        this.speciesList = response.data
       })
     },
     onRefresh() {
-      this.getUserList()
+      this.getSpeciesList()
     },
     addSubmit() {
-      addUser(this.addUserForm).then(response => {
+      addSpecies(this.addSpeciesForm).then(response => {
         this.$message({
           message: response.message,
           type: 'alert'
         })
         this.addDialogVisible = false
-        this.getUserList()
+        this.getSpeciesList()
       })
     },
     updateBtn() {
     // 判断是否勾选了 ，无勾选不予弹窗，并给予提示
-    // userTable 为table 的ref
-      const _selectData = this.$refs.userTable.selection
+    // speciesTable 为table 的ref
+      const _selectData = this.$refs.speciesTable.selection
       if (_selectData.length === 0) {
         this.$message({
           message: '请选择一行数据',
@@ -189,21 +169,21 @@ export default {
       // 显示弹窗
       this.updateDialogVisible = true
       // 将选中的数据进行赋值
-      this.updateUserForm = _selectData[0]
+      this.updateSpeciesForm = _selectData[0]
     },
     updateSubmit() {
-      updateUser(this.updateUserForm).then(response => {
+      updateSpecies(this.updateSpeciesForm).then(response => {
         this.$message({
           message: response.message,
           type: 'alert'
         })
         this.updateDialogVisible = false
-        this.getUserList()
+        this.getSpeciesList()
       })
     },
     deleteBatch() {
-      const user_ids = []
-      const _selectData = this.$refs.userTable.selection
+      const species_ids = []
+      const _selectData = this.$refs.speciesTable.selection
       if (_selectData.length === 0) {
         this.$message({
           message: '请至少选择一行数据',
@@ -212,14 +192,7 @@ export default {
         return false
       }
       for (const i in _selectData) {
-        if (_selectData[i].user_id === 1) {
-          this.$message({
-            message: '超级管理员不能删除',
-            type: 'warning'
-          })
-          return false
-        }
-        user_ids.push(_selectData[i].user_id)
+        species_ids.push(_selectData[i].species_id)
       }
       this.$confirm('是否删除?', '提示', {
         confirmButtonText: '确定',
@@ -227,14 +200,14 @@ export default {
         type: 'warning'
       }).then(() => {
         const temp = {
-          user_ids: user_ids
+          species_ids: species_ids
         }
-        deleteUser(temp).then(response => {
+        deleteSpecies(temp).then(response => {
           this.$message({
             message: response.message,
             type: 'alert'
           })
-          this.getUserList()
+          this.getSpeciesList()
         })
       }).catch(() => {
         return false

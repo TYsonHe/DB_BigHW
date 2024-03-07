@@ -1,11 +1,11 @@
-<!--用户管理页面 admin专属-->
+<!--观测站管理页面 admin专属-->
 <template>
   <el-row>
     <el-col :span="24">
       <el-card class="box-card">
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
-            <el-input v-model="query.name" placeholder="请输入用户名" clearable>
+            <el-input v-model="query.name" placeholder="请输入观测站名" clearable>
               <el-button slot="append" icon="el-icon-search" @click="queryBtn" />
             </el-input>
           </el-col>
