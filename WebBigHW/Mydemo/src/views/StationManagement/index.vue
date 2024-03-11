@@ -20,8 +20,8 @@
         </el-row>
         <!--展示表格-->
         <el-table
-          ref="userTable"
-          :data="userList"
+          ref="stationTable"
+          :data="stationList"
           border
           stripe
           style="width: 100%"
@@ -31,28 +31,23 @@
             width="55"
           />
           <el-table-column
-            prop="user_id"
-            label="用户id"
-            align="center"
-          />
-          <el-table-column
-            prop="user_name"
-            label="用户名"
-            align="center"
-          />
-          <el-table-column
-            prop="password"
-            label="密码"
-            align="center"
-          />
-          <el-table-column
-            prop="roles"
-            label="身份"
-            align="center"
-          />
-          <el-table-column
             prop="station_id"
             label="观测站id"
+            align="center"
+          />
+          <el-table-column
+            prop="station_name"
+            label="观测站名字"
+            align="center"
+          />
+          <el-table-column
+            prop="location_name"
+            label="位置"
+            align="center"
+          />
+          <el-table-column
+            prop="equipment"
+            label="装置信息"
             align="center"
           />
         </el-table>
@@ -65,18 +60,18 @@
       :visible.sync="addDialogVisible"
       width="30%"
     >
-      <el-form ref="addRuleForm" :model="addUserForm" label-width="90px">
+      <el-form ref="addRuleForm" :model="addStationForm" label-width="90px">
         <el-form-item label="用户名">
-          <el-input v-model="addUserForm.user_name" />
+          <el-input v-model="addStationForm.station_name" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="addUserForm.password" />
+          <el-input v-model="addStationForm.password" />
         </el-form-item>
         <el-form-item label="权限">
-          <el-input v-model="addUserForm.roles" />
+          <el-input v-model="addStationForm.roles" />
         </el-form-item>
         <el-form-item label="观测站id">
-          <el-input v-model="addUserForm.station_id" />
+          <el-input v-model="addStationForm.station_id" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -91,21 +86,21 @@
       :visible.sync="updateDialogVisible"
       width="30%"
     >
-      <el-form ref="updateRuleForm" :model="updateUserForm" label-width="90px">
-        <el-form-item label="用户id" prop="user_id">
-          <el-input v-model="updateUserForm.user_id" disabled />
+      <el-form ref="updateRuleForm" :model="updateStationForm" label-width="90px">
+        <el-form-item label="用户id" prop="station_id">
+          <el-input v-model="updateStationForm.station_id" disabled />
         </el-form-item>
-        <el-form-item label="用户名" prop="user_name">
-          <el-input v-model="updateUserForm.user_name" />
+        <el-form-item label="用户名" prop="station_name">
+          <el-input v-model="updateStationForm.station_name" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="updateUserForm.password" />
+          <el-input v-model="updateStationForm.password" />
         </el-form-item>
         <el-form-item label="权限" prop="roles">
-          <el-input v-model="updateUserForm.roles" />
+          <el-input v-model="updateStationForm.roles" />
         </el-form-item>
         <el-form-item label="观测站id" prop="station_id">
-          <el-input v-model="updateUserForm.station_id" />
+          <el-input v-model="updateStationForm.station_id" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -117,10 +112,10 @@
 </template>
 
 <script>
-import { getAllUsers, addUser, updateUser, deleteUser } from '@/api/user_management/user_management'
+import { getAllStations, addStation, updateStation, deleteStation } from '@/api/station_management/station_management'
 
 export default {
-  name: 'SysUser',
+  name: 'SysStation',
   data() {
     return {
       query: {
@@ -129,50 +124,49 @@ export default {
         name: ''
       },
       addDialogVisible: false,
-      addUserForm: {
-        user_name: '',
+      addStationForm: {
+        station_name: '',
         password: '',
         roles: '',
         station_id: ''
       },
       updateDialogVisible: false,
-      updateUserForm: {
-        user_id: '',
-        user_name: '',
+      updateStationForm: {
+        station_id: '',
+        station_name: '',
         password: '',
-        roles: '',
-        station_id: ''
+        roles: ''
       },
-      userList: []
+      stationList: []
     }
   },
   created() {
-    this.getUserList()
+    this.getStationList()
   },
   methods: {
-    async getUserList() {
-      await getAllUsers().then(response => {
+    async getStationList() {
+      await getAllStations().then(response => {
         console.log(response)
-        this.userList = response.data
+        this.stationList = response.data
       })
     },
     onRefresh() {
-      this.getUserList()
+      this.getStationList()
     },
     addSubmit() {
-      addUser(this.addUserForm).then(response => {
+      addStation(this.addStationForm).then(response => {
         this.$message({
           message: response.message,
           type: 'alert'
         })
         this.addDialogVisible = false
-        this.getUserList()
+        this.getStationList()
       })
     },
     updateBtn() {
     // 判断是否勾选了 ，无勾选不予弹窗，并给予提示
-    // userTable 为table 的ref
-      const _selectData = this.$refs.userTable.selection
+    // stationTable 为table 的ref
+      const _selectData = this.$refs.stationTable.selection
       if (_selectData.length === 0) {
         this.$message({
           message: '请选择一行数据',
@@ -189,21 +183,21 @@ export default {
       // 显示弹窗
       this.updateDialogVisible = true
       // 将选中的数据进行赋值
-      this.updateUserForm = _selectData[0]
+      this.updateStationForm = _selectData[0]
     },
     updateSubmit() {
-      updateUser(this.updateUserForm).then(response => {
+      updateStation(this.updateStationForm).then(response => {
         this.$message({
           message: response.message,
           type: 'alert'
         })
         this.updateDialogVisible = false
-        this.getUserList()
+        this.getStationList()
       })
     },
     deleteBatch() {
-      const user_ids = []
-      const _selectData = this.$refs.userTable.selection
+      const station_ids = []
+      const _selectData = this.$refs.stationTable.selection
       if (_selectData.length === 0) {
         this.$message({
           message: '请至少选择一行数据',
@@ -212,14 +206,7 @@ export default {
         return false
       }
       for (const i in _selectData) {
-        if (_selectData[i].user_id === 1) {
-          this.$message({
-            message: '超级管理员不能删除',
-            type: 'warning'
-          })
-          return false
-        }
-        user_ids.push(_selectData[i].user_id)
+        station_ids.push(_selectData[i].station_id)
       }
       this.$confirm('是否删除?', '提示', {
         confirmButtonText: '确定',
@@ -227,14 +214,14 @@ export default {
         type: 'warning'
       }).then(() => {
         const temp = {
-          user_ids: user_ids
+          station_ids: station_ids
         }
-        deleteUser(temp).then(response => {
+        deleteStation(temp).then(response => {
           this.$message({
             message: response.message,
             type: 'alert'
           })
-          this.getUserList()
+          this.getStationList()
         })
       }).catch(() => {
         return false

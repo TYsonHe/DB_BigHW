@@ -281,6 +281,120 @@ def species_delete():
             }
         )
 
+# station_management区域
+@app.route('/station/all', methods=['GET'])
+def station_all():
+    sql = "select * from stations"
+    result = db.RetrieveData(sql)
+    print(result)
+    return jsonify(
+        {
+            'code': 200,
+            'data': result
+        }
+    )
+
+@app.route('/station/add', methods=['POST'])
+def station_add():
+    all_data = request.get_json()
+    station_name = all_data['station_name']
+    location_name = all_data['location_name']
+    # 是否重复名字
+    sql = "select * from stations where station_name = '%s'" % station_name
+    result = db.RetrieveData(sql)
+    if len(result) != 0:
+        return jsonify(
+            {
+                'code': 400,
+                'message': '站点名字重复'
+            }
+        )
+    # 查看是否有equipment
+    if 'equipment' in all_data:
+        equipment = all_data['equipment']
+        sql = "insert into stations(station_name, location_name, equipment) values('%s', '%s', '%s')" % (
+            station_name, location_name, equipment)
+    else:
+        sql = "insert into stations(station_name, location_name) values('%s', '%s')" % (
+            station_name, location_name)
+    result = db.CreateData(sql)
+    if result == 'CreateSuccess':
+        return jsonify(
+            {
+                'code': 200,
+                'message': '添加成功'
+            }
+        )
+    else:
+        return jsonify(
+            {
+                'code': 400,
+                'message': '添加失败'
+            }
+        )
+
+@app.route('/station/update', methods=['POST'])
+def station_update():
+    all_data = request.get_json()
+    station_id = all_data['station_id']
+    station_name = all_data['station_name']
+    location_name = all_data['location_name']
+    # 是否重复名字
+    sql = "select * from stations where station_name = '%s' and station_id != '%s'" % (
+        station_name, station_id)
+    result = db.RetrieveData(sql)
+    if len(result) != 0:
+        return jsonify(
+            {
+                'code': 400,
+                'message': '站点名字重复'
+            }
+        )
+    # 查看是否有equipment
+    if 'equipment' in all_data:
+        equipment = all_data['equipment']
+        sql = "update stations set station_name = '%s', location_name = '%s', equipment = '%s' where station_id = '%s'" % (
+            station_name, location_name, equipment, station_id)
+    else:
+        sql = "update stations set station_name = '%s', location_name = '%s' where station_id = '%s'" % (
+            station_name, location_name, station_id)
+    result = db.UpdateData(sql)
+    if result == 'UpdateSuccess':
+        return jsonify(
+            {
+                'code': 200,
+                'message': '更新成功'
+            }
+        )
+    else:
+        return jsonify(
+            {
+                'code': 400,
+                'message': '更新失败'
+            }
+        )
+
+@app.route('/station/delete', methods=['POST'])
+def station_delete():
+    station_ids = request.get_json()['station_ids']
+    # 支持批量删除,这里的station_ids是一个列表,需要转换成字符串,里面是int类型
+    station_ids = ','.join([str(i) for i in station_ids])
+    sql = "delete from stations where station_id in (%s)" % station_ids
+    result = db.DeleteData(sql)
+    if result == 'DeleteSuccess':
+        return jsonify(
+            {
+                'code': 200,
+                'message': '删除成功'
+            }
+        )
+    else:
+        return jsonify(
+            {
+                'code': 400,
+                'message': '删除失败'
+            }
+        )
 
 if __name__ == '__main__':
     app.run(debug=True)
