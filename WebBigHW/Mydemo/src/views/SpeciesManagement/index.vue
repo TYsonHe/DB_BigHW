@@ -5,9 +5,7 @@
       <el-card class="box-card">
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
-            <el-input v-model="query.name" placeholder="请输入物种名" clearable>
-              <el-button slot="append" icon="el-icon-search" @click="queryBtn" />
-            </el-input>
+            <el-input v-model="formInline.name" placeholder="请输入物种名" clearable />
           </el-col>
           <el-col :span="6">
             <el-button type="primary" @click="onRefresh">刷新</el-button>
@@ -21,7 +19,7 @@
         <!--展示表格-->
         <el-table
           ref="speciesTable"
-          :data="speciesList"
+          :data="currentPageData"
           border
           stripe
           style="width: 100%"
@@ -46,6 +44,19 @@
             align="center"
           />
         </el-table>
+        <el-footer>
+          <div class="block" style="text-align: right;margin-right: 50px;">
+            <el-pagination
+              :current-page="currentPage"
+              :page-sizes="[5,10, 20, 30, 40]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="speciesList.length"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
+        </el-footer>
       </el-card>
     </el-col>
     <!--新增弹窗-->
@@ -107,9 +118,9 @@ export default {
   name: 'SysSpecies',
   data() {
     return {
-      query: {
-        current: 1,
-        size: 10,
+      currentPage: 1,
+      pageSize: 5,
+      formInline: {
         name: ''
       },
       addDialogVisible: false,
@@ -126,6 +137,19 @@ export default {
       speciesList: []
     }
   },
+  computed: {
+    currentPageData() {
+      const startIndex = (this.currentPage - 1) * this.pageSize
+      const endIndex = startIndex + this.pageSize
+      if (this.formInline.name.trim()) {
+        return this.speciesList.filter(item => {
+          const nameMatch = !this.formInline.name.trim() || item.species_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
+          return nameMatch
+        })
+      }
+      return this.speciesList.slice(startIndex, endIndex)
+    }
+  },
   created() {
     this.getSpeciesList()
   },
@@ -138,6 +162,13 @@ export default {
     },
     onRefresh() {
       this.getSpeciesList()
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.currentPage = 1 // 每次改变每页显示条数时，回到第一页
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
     },
     addSubmit() {
       addSpecies(this.addSpeciesForm).then(response => {

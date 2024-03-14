@@ -193,6 +193,17 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/station_management',
+    component: Layout,
+    redirect: '/station_management',
+    children: [{
+      path: 'index',
+      name: '站点管理',
+      component: () => import('@/views/StationManagement/index'),
+      meta: { title: '站点管理', icon: '站点管理' }
+    }]
+  },
+  {
     path: '/test2',
     component: Layout,
     children: [

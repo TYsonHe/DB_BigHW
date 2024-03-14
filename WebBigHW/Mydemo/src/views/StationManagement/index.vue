@@ -5,9 +5,7 @@
       <el-card class="box-card">
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
-            <el-input v-model="query.name" placeholder="请输入观测站名" clearable>
-              <el-button slot="append" icon="el-icon-search" @click="queryBtn" />
-            </el-input>
+            <el-input v-model="formInline.name" placeholder="请输入观测站名" clearable />
           </el-col>
           <el-col :span="6">
             <el-button type="primary" @click="onRefresh">刷新</el-button>
@@ -21,7 +19,7 @@
         <!--展示表格-->
         <el-table
           ref="stationTable"
-          :data="stationList"
+          :data="currentPageData"
           border
           stripe
           style="width: 100%"
@@ -51,27 +49,39 @@
             align="center"
           />
         </el-table>
+        <el-footer>
+          <div class="block" style="text-align: right;margin-right: 50px;">
+            <el-pagination
+              :current-page="currentPage"
+              :page-sizes="[5,10, 20, 30, 40]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="stationList.length"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
+        </el-footer>
       </el-card>
     </el-col>
+
     <!--新增弹窗-->
     <el-dialog
       center
       title="新增"
       :visible.sync="addDialogVisible"
       width="30%"
+      @close="addFormClose"
     >
       <el-form ref="addRuleForm" :model="addStationForm" label-width="90px">
-        <el-form-item label="用户名">
+        <el-form-item label="观测站名">
           <el-input v-model="addStationForm.station_name" />
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="addStationForm.password" />
+        <el-form-item label="观测站位置">
+          <el-input v-model="addStationForm.location_name" />
         </el-form-item>
-        <el-form-item label="权限">
-          <el-input v-model="addStationForm.roles" />
-        </el-form-item>
-        <el-form-item label="观测站id">
-          <el-input v-model="addStationForm.station_id" />
+        <el-form-item label="装置信息">
+          <el-input v-model="addStationForm.equipment" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -85,22 +95,20 @@
       title="修改"
       :visible.sync="updateDialogVisible"
       width="30%"
+      @close="updateFormClose"
     >
       <el-form ref="updateRuleForm" :model="updateStationForm" label-width="90px">
-        <el-form-item label="用户id" prop="station_id">
+        <el-form-item label="站点id" prop="station_id">
           <el-input v-model="updateStationForm.station_id" disabled />
         </el-form-item>
-        <el-form-item label="用户名" prop="station_name">
+        <el-form-item label="观测站名" prop="station_name">
           <el-input v-model="updateStationForm.station_name" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="updateStationForm.password" />
+        <el-form-item label="位置" prop="location_name">
+          <el-input v-model="updateStationForm.location_name" />
         </el-form-item>
-        <el-form-item label="权限" prop="roles">
-          <el-input v-model="updateStationForm.roles" />
-        </el-form-item>
-        <el-form-item label="观测站id" prop="station_id">
-          <el-input v-model="updateStationForm.station_id" />
+        <el-form-item label="装置信息" prop="equipment">
+          <el-input v-model="updateStationForm.equipment" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -118,26 +126,38 @@ export default {
   name: 'SysStation',
   data() {
     return {
-      query: {
-        current: 1,
-        size: 10,
+      currentPage: 1,
+      pageSize: 6,
+      formInline: {
         name: ''
       },
       addDialogVisible: false,
       addStationForm: {
         station_name: '',
-        password: '',
-        roles: '',
-        station_id: ''
+        location_name: '',
+        equipment: ''
       },
       updateDialogVisible: false,
       updateStationForm: {
         station_id: '',
         station_name: '',
-        password: '',
-        roles: ''
+        location_name: '',
+        equipment: ''
       },
       stationList: []
+    }
+  },
+  computed: {
+    currentPageData() {
+      const startIndex = (this.currentPage - 1) * this.pageSize
+      const endIndex = startIndex + this.pageSize
+      if (this.formInline.name.trim()) {
+        return this.stationList.filter(item => {
+          const nameMatch = !this.formInline.name.trim() || item.station_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
+          return nameMatch
+        })
+      }
+      return this.stationList.slice(startIndex, endIndex)
     }
   },
   created() {
@@ -152,6 +172,13 @@ export default {
     },
     onRefresh() {
       this.getStationList()
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.currentPage = 1 // 每次改变每页显示条数时，回到第一页
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
     },
     addSubmit() {
       addStation(this.addStationForm).then(response => {
@@ -184,6 +211,7 @@ export default {
       this.updateDialogVisible = true
       // 将选中的数据进行赋值
       this.updateStationForm = _selectData[0]
+      console.log(this.updateStationForm)
     },
     updateSubmit() {
       updateStation(this.updateStationForm).then(response => {
@@ -226,6 +254,22 @@ export default {
       }).catch(() => {
         return false
       })
+    },
+    addFormClose() {
+      this.$refs.addRuleForm.resetFields()
+      this.addSpeciesForm = {
+        species_name: '',
+        description: ''
+      }
+    },
+    // 修改弹窗关闭回调事件
+    updateFormClose() {
+      this.$refs.updateRuleForm.resetFields()
+      this.updateSpeciesForm = {
+        species_id: '',
+        species_name: '',
+        description: ''
+      }
     }
   }// end of methods
 }
