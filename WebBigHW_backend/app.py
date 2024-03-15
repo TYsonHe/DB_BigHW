@@ -1,6 +1,7 @@
 import pymysql
 import os
 import io
+import pendulum
 from CrudDb import CrudDb
 from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
@@ -13,6 +14,9 @@ app.config['JWT_SECRET_KEY'] = 'Tyson'  # 使用一个安全的密钥
 jwt = JWTManager(app)
 
 db = CrudDb('configs\db.yml')
+
+# 时区设置
+pendulum.set_locale('zh')
 
 # 解决跨域问题
 CORS(app, resources={r'/*': {'origins': '*'}})
@@ -102,6 +106,11 @@ def user_add():
         username, password, roles, station_id)
     result = db.CreateData(sql)
     if result == 'CreateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里只能admin添加用户,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '添加用户', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -128,6 +137,11 @@ def user_update():
         username, password, roles, station_id, user_id)
     result = db.UpdateData(sql)
     if result == 'UpdateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里只能admin更改用户,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '更改用户', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -151,6 +165,11 @@ def user_delete():
     sql = "delete from user_info where user_id in (%s)" % user_ids
     result = db.DeleteData(sql)
     if result == 'DeleteSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里只能admin删除用户,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '删除用户', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -203,6 +222,17 @@ def species_add():
         sql = "insert into species(species_name) values('%s')" % species_name
     result = db.CreateData(sql)
     if result == 'CreateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里需要获取当前用户的user_id
+        token = request.headers.get('X-Token')
+        decoded_token = decode_token(token)
+        username = decoded_token['sub']
+        sql = "select * from user_info where user_name = '%s'" % username
+        result = db.RetrieveData(sql)
+        user_id = result[0]['user_id']
+        sql = "insert into logs(user_id, action, time) values('%s', '添加物种', '%s')" % (
+            user_id, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -244,6 +274,17 @@ def species_update():
             species_name, species_id)
     result = db.UpdateData(sql)
     if result == 'UpdateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里需要获取当前用户的user_id
+        token = request.headers.get('X-Token')
+        decoded_token = decode_token(token)
+        username = decoded_token['sub']
+        sql = "select * from user_info where user_name = '%s'" % username
+        result = db.RetrieveData(sql)
+        user_id = result[0]['user_id']
+        sql = "insert into logs(user_id, action, time) values('%s', '更改物种', '%s')" % (
+            user_id, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -267,6 +308,17 @@ def species_delete():
     sql = "delete from species where species_id in (%s)" % species_ids
     result = db.DeleteData(sql)
     if result == 'DeleteSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 这里需要获取当前用户的user_id
+        token = request.headers.get('X-Token')
+        decoded_token = decode_token(token)
+        username = decoded_token['sub']
+        sql = "select * from user_info where user_name = '%s'" % username
+        result = db.RetrieveData(sql)
+        user_id = result[0]['user_id']
+        sql = "insert into logs(user_id, action, time) values('%s', '删除物种', '%s')" % (
+            user_id, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -282,6 +334,8 @@ def species_delete():
         )
 
 # station_management区域
+
+
 @app.route('/station/all', methods=['GET'])
 def station_all():
     sql = "select * from stations"
@@ -293,6 +347,7 @@ def station_all():
             'data': result
         }
     )
+
 
 @app.route('/station/add', methods=['POST'])
 def station_add():
@@ -319,6 +374,11 @@ def station_add():
             station_name, location_name)
     result = db.CreateData(sql)
     if result == 'CreateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 因为只有admin可以添加站点,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '添加站点', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -332,6 +392,7 @@ def station_add():
                 'message': '添加失败'
             }
         )
+
 
 @app.route('/station/update', methods=['POST'])
 def station_update():
@@ -360,6 +421,11 @@ def station_update():
             station_name, location_name, station_id)
     result = db.UpdateData(sql)
     if result == 'UpdateSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 因为只有admin可以更改站点,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '更改站点', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -374,6 +440,7 @@ def station_update():
             }
         )
 
+
 @app.route('/station/delete', methods=['POST'])
 def station_delete():
     station_ids = request.get_json()['station_ids']
@@ -382,6 +449,11 @@ def station_delete():
     sql = "delete from stations where station_id in (%s)" % station_ids
     result = db.DeleteData(sql)
     if result == 'DeleteSuccess':
+        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
+        # 因为只有admin可以删除站点,所以user_id写死为1
+        sql = "insert into logs(user_id, action, time) values('%s', '删除站点', '%s')" % (
+            1, now_time)
+        db.CreateData(sql)
         return jsonify(
             {
                 'code': 200,
@@ -395,6 +467,22 @@ def station_delete():
                 'message': '删除失败'
             }
         )
+
+# logs_management区域
+
+
+@app.route('/logs/all', methods=['GET'])
+def logs_all():
+    sql = "select * from logs"
+    result = db.RetrieveData(sql)
+    print(result)
+    return jsonify(
+        {
+            'code': 200,
+            'data': result
+        }
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True)

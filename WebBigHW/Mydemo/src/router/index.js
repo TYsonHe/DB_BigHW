@@ -200,7 +200,18 @@ export const asyncRoutes = [
       path: 'index',
       name: '站点管理',
       component: () => import('@/views/StationManagement/index'),
-      meta: { title: '站点管理', icon: '站点管理' }
+      meta: { title: '站点管理', icon: '站点管理', roles: ['admin'] }
+    }]
+  },
+  {
+    path: '/logs_management',
+    component: Layout,
+    redirect: '/logs_management',
+    children: [{
+      path: 'index',
+      name: '日志管理',
+      component: () => import('@/views/LogsManagement/logs_management.vue'),
+      meta: { title: '日志管理', icon: '日志管理', roles: ['admin'] }
     }]
   },
   {
