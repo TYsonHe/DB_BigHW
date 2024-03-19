@@ -8,6 +8,9 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from monitoring_mission import MonitoringMission
+from station import Station
+from species import Species
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'Tyson'  # 使用一个安全的密钥
@@ -108,7 +111,7 @@ def user_add():
     if result == 'CreateSuccess':
         now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
         # 这里只能admin添加用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '添加用户', '%s')" % (
+        sql = "insert into logs(user_id, action, timestamp) values('%s', '添加用户', '%s')" % (
             1, now_time)
         db.CreateData(sql)
         return jsonify(
@@ -139,7 +142,7 @@ def user_update():
     if result == 'UpdateSuccess':
         now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
         # 这里只能admin更改用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '更改用户', '%s')" % (
+        sql = "insert into logs(user_id, action, timestamp) values('%s', '更改用户', '%s')" % (
             1, now_time)
         db.CreateData(sql)
         return jsonify(
@@ -167,7 +170,7 @@ def user_delete():
     if result == 'DeleteSuccess':
         now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
         # 这里只能admin删除用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '删除用户', '%s')" % (
+        sql = "insert into logs(user_id, action, timestamp) values('%s', '删除用户', '%s')" % (
             1, now_time)
         db.CreateData(sql)
         return jsonify(
@@ -188,292 +191,57 @@ def user_delete():
 # species_management区域
 @app.route('/species/all', methods=['GET'])
 def species_all():
-    sql = "select * from species"
-    result = db.RetrieveData(sql)
-    print(result)
-    return jsonify(
-        {
-            'code': 200,
-            'data': result
-        }
-    )
+    return Species().get_all_species(db)
 
 
 @app.route('/species/add', methods=['POST'])
 def species_add():
     all_data = request.get_json()
-    species_name = all_data['species_name']
-    # 是否重复名字
-    sql = "select * from species where species_name = '%s'" % species_name
-    result = db.RetrieveData(sql)
-    if len(result) != 0:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '物种名字重复'
-            }
-        )
-    # 查看是否有description
-    if 'description' in all_data:
-        description = all_data['description']
-        sql = "insert into species(species_name, description) values('%s', '%s')" % (
-            species_name, description)
-    else:
-        sql = "insert into species(species_name) values('%s')" % species_name
-    result = db.CreateData(sql)
-    if result == 'CreateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里需要获取当前用户的user_id
-        token = request.headers.get('X-Token')
-        decoded_token = decode_token(token)
-        username = decoded_token['sub']
-        sql = "select * from user_info where user_name = '%s'" % username
-        result = db.RetrieveData(sql)
-        user_id = result[0]['user_id']
-        sql = "insert into logs(user_id, action, time) values('%s', '添加物种', '%s')" % (
-            user_id, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '添加成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '添加失败'
-            }
-        )
+    return Species().add_species(db, all_data, request)
 
 
 @app.route('/species/update', methods=['POST'])
 def species_update():
     all_data = request.get_json()
-    species_id = all_data['species_id']
-    species_name = all_data['species_name']
-    # 是否重复名字
-    sql = "select * from species where species_name = '%s' and species_id != '%s'" % (
-        species_name, species_id)
-    result = db.RetrieveData(sql)
-    if len(result) != 0:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '物种名字重复'
-            }
-        )
-    # 查看是否有description
-    if 'description' in all_data:
-        description = all_data['description']
-        sql = "update species set species_name = '%s', description = '%s' where species_id = '%s'" % (
-            species_name, description, species_id)
-    else:
-        sql = "update species set species_name = '%s' where species_id = '%s'" % (
-            species_name, species_id)
-    result = db.UpdateData(sql)
-    if result == 'UpdateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里需要获取当前用户的user_id
-        token = request.headers.get('X-Token')
-        decoded_token = decode_token(token)
-        username = decoded_token['sub']
-        sql = "select * from user_info where user_name = '%s'" % username
-        result = db.RetrieveData(sql)
-        user_id = result[0]['user_id']
-        sql = "insert into logs(user_id, action, time) values('%s', '更改物种', '%s')" % (
-            user_id, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '更新成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '更新失败'
-            }
-        )
+    return Species().update_species(db, all_data, request)
 
 
 @app.route('/species/delete', methods=['POST'])
 def species_delete():
-    species_ids = request.get_json()['species_ids']
-    # 支持批量删除,这里的species_ids是一个列表,需要转换成字符串,里面是int类型
-    species_ids = ','.join([str(i) for i in species_ids])
-    sql = "delete from species where species_id in (%s)" % species_ids
-    result = db.DeleteData(sql)
-    if result == 'DeleteSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里需要获取当前用户的user_id
-        token = request.headers.get('X-Token')
-        decoded_token = decode_token(token)
-        username = decoded_token['sub']
-        sql = "select * from user_info where user_name = '%s'" % username
-        result = db.RetrieveData(sql)
-        user_id = result[0]['user_id']
-        sql = "insert into logs(user_id, action, time) values('%s', '删除物种', '%s')" % (
-            user_id, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '删除成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '删除失败'
-            }
-        )
+    all_data = request.get_json()
+    return Species().delete_species(db, all_data, request)
 
 # station_management区域
 
 
 @app.route('/station/all', methods=['GET'])
 def station_all():
-    sql = "select * from stations"
-    result = db.RetrieveData(sql)
-    print(result)
-    return jsonify(
-        {
-            'code': 200,
-            'data': result
-        }
-    )
+    return Station().get_all_stations(db)
 
 
 @app.route('/station/add', methods=['POST'])
 def station_add():
     all_data = request.get_json()
-    station_name = all_data['station_name']
-    location_name = all_data['location_name']
-    # 是否重复名字
-    sql = "select * from stations where station_name = '%s'" % station_name
-    result = db.RetrieveData(sql)
-    if len(result) != 0:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '站点名字重复'
-            }
-        )
-    # 查看是否有equipment
-    if 'equipment' in all_data:
-        equipment = all_data['equipment']
-        sql = "insert into stations(station_name, location_name, equipment) values('%s', '%s', '%s')" % (
-            station_name, location_name, equipment)
-    else:
-        sql = "insert into stations(station_name, location_name) values('%s', '%s')" % (
-            station_name, location_name)
-    result = db.CreateData(sql)
-    if result == 'CreateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 因为只有admin可以添加站点,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '添加站点', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '添加成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '添加失败'
-            }
-        )
+    return Station().add_station(db, all_data)
 
 
 @app.route('/station/update', methods=['POST'])
 def station_update():
     all_data = request.get_json()
-    station_id = all_data['station_id']
-    station_name = all_data['station_name']
-    location_name = all_data['location_name']
-    # 是否重复名字
-    sql = "select * from stations where station_name = '%s' and station_id != '%s'" % (
-        station_name, station_id)
-    result = db.RetrieveData(sql)
-    if len(result) != 0:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '站点名字重复'
-            }
-        )
-    # 查看是否有equipment
-    if 'equipment' in all_data:
-        equipment = all_data['equipment']
-        sql = "update stations set station_name = '%s', location_name = '%s', equipment = '%s' where station_id = '%s'" % (
-            station_name, location_name, equipment, station_id)
-    else:
-        sql = "update stations set station_name = '%s', location_name = '%s' where station_id = '%s'" % (
-            station_name, location_name, station_id)
-    result = db.UpdateData(sql)
-    if result == 'UpdateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 因为只有admin可以更改站点,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '更改站点', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '更新成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '更新失败'
-            }
-        )
+    return Station().update_station(db, all_data)
 
 
 @app.route('/station/delete', methods=['POST'])
 def station_delete():
-    station_ids = request.get_json()['station_ids']
-    # 支持批量删除,这里的station_ids是一个列表,需要转换成字符串,里面是int类型
-    station_ids = ','.join([str(i) for i in station_ids])
-    sql = "delete from stations where station_id in (%s)" % station_ids
-    result = db.DeleteData(sql)
-    if result == 'DeleteSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 因为只有admin可以删除站点,所以user_id写死为1
-        sql = "insert into logs(user_id, action, time) values('%s', '删除站点', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '删除成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '删除失败'
-            }
-        )
+    all_data = request.get_json()
+    return Station().delete_station(db, all_data)
 
 # logs_management区域
 
 
 @app.route('/logs/all', methods=['GET'])
 def logs_all():
-    sql = "select * from logs"
+    sql = "select * from logs ORDER BY `timestamp` DESC"
     result = db.RetrieveData(sql)
     print(result)
     return jsonify(
@@ -482,6 +250,31 @@ def logs_all():
             'data': result
         }
     )
+
+# monitoring_management区域
+
+
+@app.route('/monitor_mission_management/getAllMonitoringTasks', methods=['GET'])
+def getAllMonitoringTasks():
+    return MonitoringMission().get_all_missions(db)
+
+
+@app.route('/monitor_mission_management/addMonitoringTask', methods=['POST'])
+def addMonitoringTask():
+    all_data = request.get_json()
+    return MonitoringMission().add_mission(db, all_data)
+
+
+@app.route('/monitor_mission_management/updateMonitoringTask', methods=['POST'])
+def updateMonitoringTask():
+    all_data = request.get_json()
+    return MonitoringMission().update_mission(db, all_data)
+
+
+@app.route('/monitor_mission_management/deleteMonitoringTask', methods=['POST'])
+def deleteMonitoringTask():
+    all_data = request.get_json()
+    return MonitoringMission().delete_mission(db, all_data)
 
 
 if __name__ == '__main__':

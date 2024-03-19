@@ -215,6 +215,17 @@ export const asyncRoutes = [
     }]
   },
   {
+    path: '/monitor_mission_management',
+    component: Layout,
+    redirect: '/monitor_mission_management',
+    children: [{
+      path: 'index',
+      name: '监测任务管理',
+      component: () => import('@/views/MonitorMissionManagement/monitor_mission_management.vue'),
+      meta: { title: '监测任务管理', icon: '监测任务管理', roles: ['admin'] }
+    }]
+  },
+  {
     path: '/test2',
     component: Layout,
     children: [
