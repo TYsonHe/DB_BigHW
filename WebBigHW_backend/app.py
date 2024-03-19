@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from monitoring_mission import MonitoringMission
 from station import Station
 from species import Species
+from user import User
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'Tyson'  # 使用一个安全的密钥
@@ -88,104 +89,25 @@ def user_info():
 # user_management区域
 @app.route('/user/all', methods=['GET'])
 def user_all():
-    sql = "select * from user_info"
-    result = db.RetrieveData(sql)
-    print(result)
-    return jsonify(
-        {
-            'code': 200,
-            'data': result
-        }
-    )
+    return User().get_all_users(db)
 
 
 @app.route('/user/add', methods=['POST'])
 def user_add():
-    username = request.get_json()['user_name']
-    password = request.get_json()['password']
-    roles = request.get_json()['roles']
-    station_id = request.get_json()['station_id']
-    sql = "insert into user_info(user_name, password, roles, station_id) values('%s', '%s', '%s', '%s')" % (
-        username, password, roles, station_id)
-    result = db.CreateData(sql)
-    if result == 'CreateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里只能admin添加用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, timestamp) values('%s', '添加用户', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '添加成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '添加失败'
-            }
-        )
+    all_data = request.get_json()
+    return User().add_user(db, all_data)
 
 
 @app.route('/user/update', methods=['POST'])
 def user_update():
-    user_id = request.get_json()['user_id']
-    username = request.get_json()['user_name']
-    password = request.get_json()['password']
-    roles = request.get_json()['roles']
-    station_id = request.get_json()['station_id']
-    sql = "update user_info set user_name = '%s', password = '%s', roles = '%s', station_id = '%s' where user_id = '%s'" % (
-        username, password, roles, station_id, user_id)
-    result = db.UpdateData(sql)
-    if result == 'UpdateSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里只能admin更改用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, timestamp) values('%s', '更改用户', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '更新成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '更新失败'
-            }
-        )
+    all_data = request.get_json()
+    return User().update_user(db, all_data)
 
 
 @app.route('/user/delete', methods=['POST'])
 def user_delete():
-    user_ids = request.get_json()['user_ids']
-    # 支持批量删除,这里的user_ids是一个列表,需要转换成字符串,里面是int类型
-    user_ids = ','.join([str(i) for i in user_ids])
-    sql = "delete from user_info where user_id in (%s)" % user_ids
-    result = db.DeleteData(sql)
-    if result == 'DeleteSuccess':
-        now_time = pendulum.now().format('YYYY-MM-DD HH:mm:ss')
-        # 这里只能admin删除用户,所以user_id写死为1
-        sql = "insert into logs(user_id, action, timestamp) values('%s', '删除用户', '%s')" % (
-            1, now_time)
-        db.CreateData(sql)
-        return jsonify(
-            {
-                'code': 200,
-                'message': '删除成功'
-            }
-        )
-    else:
-        return jsonify(
-            {
-                'code': 400,
-                'message': '删除失败'
-            }
-        )
+    all_data = request.get_json()
+    return User().delete_user(db, all_data)
 
 
 # species_management区域
