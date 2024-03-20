@@ -3,14 +3,14 @@
     <el-col span="24">
       <div class="container">
         <div class="logo">
-          <h2 class="title">爬虫项目制作</h2>
+          <h2 class="title">海洋生物多样性检测和保护系统</h2>
           <div class="tech">
-            <p class="tech-text">所用技术: Python、Flask、Vue、Echarts、WordCloud</p>
-            <p class="tech-text">目标网站: 豆瓣</p>
+            <p class="tech-text">所用技术: Python、Flask、Vue2、Echarts、</p>
+            <p class="tech-text">技术让世界更美好</p>
           </div>
         </div>
         <div class="img">
-          <img :src="imgsrc" alt="" width="500px" height="500px">
+          <img :src="imgsrc" alt="" width="980px" height="500px">
         </div>
       </div>
     </el-col>
@@ -34,7 +34,7 @@
 export default {
   data() {
     return {
-      imgsrc: require('@/assets/images/前端爬虫.png')
+      imgsrc: require('@/assets/images/主页.png')
     }
   }
 }
