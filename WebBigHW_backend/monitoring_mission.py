@@ -1,6 +1,7 @@
 from flask import jsonify
 import pendulum
 from CrudDb import CrudDb
+from flask_jwt_extended import decode_token
 
 
 class MonitoringMission:
@@ -118,3 +119,62 @@ class MonitoringMission:
                     'message': '删除失败'
                 }
             )
+
+    # 下面是接受监控任务的接口
+    def get_task_list_by_role(self, db, request):
+        # 获取token
+        token = request.headers.get('X-Token')
+        # 解析token
+        user_info = decode_token(token)
+        # 获取用户名
+        user_name = user_info['sub']
+        # 获取用户信息
+        sql = "select * from user_info where user_name = '%s'" % user_name
+        result = db.RetrieveData(sql)
+        user_role = result[0]['roles']
+        # 获取用户所在的观测站id
+        if user_role == 'admin':
+            # 获取所有的监控任务
+            sql = "select * from monitoring_task"
+            result = db.RetrieveData(sql)
+            return jsonify(
+                {
+                    'code': 200,
+                    'data': result
+                }
+            )
+        station_id = result[0]['station_id']
+        # 获取用户角色所在的观测站对应的监控任务
+        sql = "select * from monitoring_task where station_id = %d" % station_id
+        result = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': result
+            }
+        )
+
+    def accept_monitor_task(db, request):
+        # 获取token
+        token = request.headers.get('X-Token')
+        # 解析token
+        user_info = decode_token(token)
+        # 获取用户名
+        user_name = user_info['sub']
+        # 获取用户信息
+        sql = "select * from user_info where user_name = '%s'" % user_name
+        result = db.RetrieveData(sql)
+        user_id = result[0]['user_id']
+        # 获取用户角色
+        user_role = result[0]['roles']
+        # 获取用户所在的观测站id
+        station_id = result[0]['station_id']
+        # 获取用户所在的观测站对应的监控任务
+        sql = "select * from monitoring_task where station_id = %d" % station_id
+        result = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': result
+            }
+        )

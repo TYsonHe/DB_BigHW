@@ -110,8 +110,25 @@
         <el-form-item label="所属站点id" prop="station_id">
           <el-input v-model="updateMonitoringTaskForm.station_id" disabled />
         </el-form-item>
-        <el-form-item label="开始时间">
-          <el-input v-model="updateMonitoringTaskForm.start_time" disabled />
+        <el-form-item label="监测物种">
+          <el-select v-model="updateMonitoringTaskForm.species_id">
+            <el-option
+              v-for="item in speciesList"
+              :key="item.species_id"
+              :label="item.species_id+ ' ' + item.species_name"
+              :value="item.species_id"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="该物种数量">
+          <el-input v-model="updateMonitoringTaskForm.quantity" />
+        </el-form-item>
+        <el-form-item label="是否完成" prop="is_done">
+          <el-radio-group v-model="updateMonitoringTaskForm.is_done">
+            <el-radio label="Undone">未完成</el-radio>
+            <el-radio label="Done">已完成</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -124,6 +141,7 @@
 
 <script>
 import { getMonitorTaskListByRole, acceptMonitorTask } from '@/api/monitor_mission_management/accept_monitor_task'
+import { getAllSpecies } from '@/api/species_management/species_management'
 
 export default {
   name: 'SysAcceptMonitoringTask',
@@ -147,9 +165,13 @@ export default {
         monitoring_task_id: '',
         monitoring_task_name: '',
         station_id: '',
-        start_time: ''
+        start_time: '',
+        species_id: '',
+        quantity: '',
+        is_done: ''
       },
-      monitoring_taskList: []
+      monitoring_taskList: [],
+      speciesList: []
     }
   },
   computed: {
@@ -167,6 +189,7 @@ export default {
   },
   created() {
     this.getMonitoringTaskList()
+    this.getSpeciesList()
   },
   methods: {
     async getMonitoringTaskList() {
@@ -175,8 +198,15 @@ export default {
         this.monitoring_taskList = response.data
       })
     },
+    async getSpeciesList() {
+      await getAllSpecies().then(response => {
+        console.log(response)
+        this.speciesList = response.data
+      })
+    },
     onRefresh() {
       this.getMonitoringTaskList()
+      this.getSpeciesList()
     },
     handleSizeChange(val) {
       this.pageSize = val

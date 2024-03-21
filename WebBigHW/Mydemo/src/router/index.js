@@ -232,7 +232,7 @@ export const asyncRoutes = [
     children: [{
       path: 'index',
       name: '接收监测任务',
-      component: () => import('@/views/MonitorMissionManagement/check_monitor_task.vue'),
+      component: () => import('@/views/MonitorMissionManagement/accept_monitor_task.vue'),
       meta: { title: '接收监测任务', icon: '接收任务审核', roles: ['user'] }
     }]
   },

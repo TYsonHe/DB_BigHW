@@ -199,5 +199,15 @@ def deleteMonitoringTask():
     return MonitoringMission().delete_mission(db, all_data)
 
 
+@app.route('/monitor_task/getMonitorTaskListByRole', methods=['GET'])
+def getMonitorTaskListByRole():
+    return MonitoringMission().get_task_list_by_role(db, request)
+
+
+@app.route('/monitor_task/acceptMonitorTask', methods=['POST'])
+def acceptMonitorTask():
+    return MonitoringMission().accept_monitor_task(db, request)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

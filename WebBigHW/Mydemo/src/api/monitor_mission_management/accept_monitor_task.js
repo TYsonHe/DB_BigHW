@@ -1,10 +1,10 @@
 import request from '@/utils/request'
 
-export function getMonitorTaskListByRole(data) {
+export function getMonitorTaskListByRole(params) {
   return request({
     url: '/monitor_task/getMonitorTaskListByRole',
-    method: 'post',
-    data
+    method: 'get',
+    params
   })
 }
 
