@@ -174,6 +174,8 @@ def logs_all():
     )
 
 # monitoring_management区域
+# 共2个页面，一个是监控任务管理，一个是接受任务
+# 监控任务管理界面
 
 
 @app.route('/monitor_mission_management/getAllMonitoringTasks', methods=['GET'])
@@ -197,6 +199,8 @@ def updateMonitoringTask():
 def deleteMonitoringTask():
     all_data = request.get_json()
     return MonitoringMission().delete_mission(db, all_data)
+
+# 接受任务界面
 
 
 @app.route('/monitor_task/getMonitorTaskListByRole', methods=['GET'])

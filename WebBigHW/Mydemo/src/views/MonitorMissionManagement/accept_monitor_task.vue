@@ -6,8 +6,8 @@
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
             <div>
-              你的身份是：{{ now_role }}
-              来自观测站：{{ now_station }}
+              你的身份是：{{ curRole }}
+              来自观测站：{{ curStation }} 号
             </div>
           </el-col>
           <el-col :span="6">
@@ -105,7 +105,7 @@
           <el-input v-model="updateMonitoringTaskForm.monitoring_task_id" disabled />
         </el-form-item>
         <el-form-item label="任务名" prop="monitoring_task_name">
-          <el-input v-model="updateMonitoringTaskForm.monitoring_task_name" />
+          <el-input v-model="updateMonitoringTaskForm.monitoring_task_name" disabled/>
         </el-form-item>
         <el-form-item label="所属站点id" prop="station_id">
           <el-input v-model="updateMonitoringTaskForm.station_id" disabled />
@@ -149,16 +149,10 @@ export default {
     return {
       currentPage: 1,
       pageSize: 6,
-      now_role: '', // 当前用户的角色
-      now_station: '', // 当前用户所在的观测站
+      curRole: '', // 当前用户的角色
+      curStation: '', // 当前用户所在的观测站
       formInline: {
         name: ''
-      },
-      addDialogVisible: false,
-      addMonitoringTaskForm: {
-        monitoring_task_name: '',
-        station_id: '',
-        start_time: ''
       },
       updateDialogVisible: false,
       updateMonitoringTaskForm: {
@@ -195,7 +189,9 @@ export default {
     async getMonitoringTaskList() {
       await getMonitorTaskListByRole().then(response => {
         console.log(response)
-        this.monitoring_taskList = response.data
+        this.monitoring_taskList = response.data.task_list
+        this.curRole = response.data.user_role
+        this.curStation = response.data.station_id
       })
     },
     async getSpeciesList() {
@@ -260,7 +256,10 @@ export default {
         monitoring_task_id: '',
         monitoring_task_name: '',
         station_id: '',
-        start_time: ''
+        start_time: '',
+        species_id: '',
+        quantity: '',
+        is_done: ''
       }
     },
     filterTag(value, row) {
