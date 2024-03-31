@@ -12,6 +12,7 @@ from monitoring_mission import MonitoringMission
 from station import Station
 from species import Species
 from user import User
+from station_species import Station_species
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'Tyson'  # 使用一个安全的密钥
@@ -211,6 +212,27 @@ def getMonitorTaskListByRole():
 @app.route('/monitor_task/acceptMonitorTask', methods=['POST'])
 def acceptMonitorTask():
     return MonitoringMission().accept_monitor_task(db, request)
+
+
+# 站点物种数量观察页面
+@app.route('/station_species_management/get_station_species_list', methods=['GET'])
+def get_station_species_list():
+    return Station_species().get_station_species_list(db, request)
+
+
+@app.route('/station_species_management/get_station_species_quantity_series', methods=['POST'])
+def get_station_species_quantity_series():
+    return Station_species().get_station_species_quantity_series(db, request)
+
+
+@app.route('/station_species_management/get_station_species_quantity_total', methods=['POST'])
+def get_station_species_quantity_total():
+    return Station_species().get_station_species_quantity_total(db, request)
+
+
+@app.route('/station_species_management/get_station_species_quantity_rank', methods=['POST'])
+def get_station_species_quantity_rank():
+    return Station_species().get_station_species_quantity_rank(db, request)
 
 
 if __name__ == '__main__':

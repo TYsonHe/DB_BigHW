@@ -237,6 +237,17 @@ export const asyncRoutes = [
     }]
   },
   {
+    path: '/station_species_management',
+    component: Layout,
+    redirect: '/station_species_management',
+    children: [{
+      path: 'index',
+      name: '站点物种管理',
+      component: () => import('@/views/StationSpeciesManagement/station_species_management.vue'),
+      meta: { title: '站点物种管理', icon: '站点物种管理', roles: ['admin'] }
+    }]
+  },
+  {
     path: '/test2',
     component: Layout,
     children: [
