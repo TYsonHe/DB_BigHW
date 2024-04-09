@@ -61,7 +61,7 @@ export const constantRoutes = [
       path: 'index',
       name: '物种管理',
       component: () => import('@/views/SpeciesManagement/index'),
-      meta: { title: '物种管理', icon: '物种管理' }
+      meta: { title: '物种管理', icon: '生物物种' }
     }]
   },
   // {
@@ -231,9 +231,9 @@ export const asyncRoutes = [
     redirect: '/check_monitor_task',
     children: [{
       path: 'index',
-      name: '接收监测任务',
+      name: '接受监测任务',
       component: () => import('@/views/MonitorMissionManagement/accept_monitor_task.vue'),
-      meta: { title: '接收监测任务', icon: '接收任务审核', roles: ['user'] }
+      meta: { title: '接受监测任务', icon: '接受监测任务', roles: ['user'] }
     }]
   },
   {
@@ -242,9 +242,9 @@ export const asyncRoutes = [
     redirect: '/station_species_management',
     children: [{
       path: 'index',
-      name: '站点物种管理',
+      name: '站点物种信息',
       component: () => import('@/views/StationSpeciesManagement/station_species_management.vue'),
-      meta: { title: '站点物种管理', icon: '站点物种管理', roles: ['admin'] }
+      meta: { title: '站点物种信息', icon: '站点物种信息', roles: ['admin'] }
     }]
   },
   {
