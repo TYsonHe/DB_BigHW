@@ -1,6 +1,7 @@
 from flask import jsonify
 import pendulum
 from CrudDb import CrudDb
+import random
 from flask_jwt_extended import decode_token
 
 
@@ -11,7 +12,7 @@ class MonitoringMission:
         pendulum.set_locale('zh')
 
     def get_all_missions(self, db: CrudDb):
-        sql = "select * from monitoring_task"
+        sql = "select * from monitoring_task ORDER BY CASE status WHEN 'Undone' THEN 1 WHEN 'Done' THEN 2 END"
         result = db.RetrieveData(sql)
         return jsonify(
             {
@@ -136,7 +137,7 @@ class MonitoringMission:
         station_id = result[0]['station_id']
         if user_role == 'admin':
             # 获取所有的监控任务
-            sql = "select * from monitoring_task"
+            sql = "select * from monitoring_task ORDER BY CASE status WHEN 'Undone' THEN 1 WHEN 'Done' THEN 2 END"
             task_list = db.RetrieveData(sql)
             return jsonify(
                 {
@@ -149,7 +150,7 @@ class MonitoringMission:
                 }
             )
         # 获取用户角色所在的观测站对应的监控任务
-        sql = "select * from monitoring_task where station_id = %d" % station_id
+        sql = "select * from monitoring_task where station_id = %d ORDER BY CASE status WHEN 'Undone' THEN 1 WHEN 'Done' THEN 2 END" % station_id
         task_list = db.RetrieveData(sql)
         return jsonify(
             {
@@ -209,7 +210,8 @@ class MonitoringMission:
         is_done = all_data['is_done']
         if is_done == 'Done':
             monitoring_task_id = all_data['monitoring_task_id']
-            sql = "update monitoring_task set status='Done' where monitoring_task_id=%d" % monitoring_task_id
+            sql = "update monitoring_task set status='Done', end_time='%s' where monitoring_task_id=%d" % (
+                now_time, monitoring_task_id)
             db.UpdateData(sql)
 
         return jsonify(
@@ -217,3 +219,92 @@ class MonitoringMission:
                 'code': 200,
                 'message': '接受成功'
             })
+
+    def get_all_task_count(self, db: CrudDb):
+        sql = "select count(*) from monitoring_task"
+        task_count = db.RetrieveData(sql)[0]['count(*)']
+        return jsonify(
+            {
+                'code': 200,
+                'data': {
+                    'task_count': task_count
+                }
+            }
+        )
+
+    def get_middle_chart_data(self, db: CrudDb, request):
+        '''
+        获取中间的图表数据
+        需要的是该站点的人员总数
+        今日已完成的任务数
+        未完成的任务数
+        '''
+        curstation_id = request.get_json()['station_id']
+
+        if curstation_id == 0:
+            # 代表是admin,获取所有站点的数据
+            sql = "select count(*) from user_info"
+            user_count = db.RetrieveData(sql)[0]['count(*)']
+            # 获取今日已完成的任务数
+            today = pendulum.now().format('YYYY-MM-DD')
+            sql = "select count(*) from monitoring_task where status = 'Done' and end_time like '%s%%'" % today
+            done_count = db.RetrieveData(sql)[0]['count(*)']
+            # 获取未完成的任务数
+            sql = "select count(*) from monitoring_task where status = 'Undone'"
+            undone_count = db.RetrieveData(sql)[0]['count(*)']
+            data_list = []
+            data_list.append(user_count)
+            data_list.append(done_count)
+            data_list.append(undone_count)
+            return jsonify(
+                {
+                    'code': 200,
+                    'data': {
+                        'dataList': data_list
+                    }
+                }
+            )
+
+        # 获取该站点的人员总数
+        sql = "select count(*) from user_info where station_id = %d" % curstation_id
+        user_count = db.RetrieveData(sql)[0]['count(*)']
+        # 获取今日已完成的任务数
+        today = pendulum.now().format('YYYY-MM-DD')
+        sql = "select count(*) from monitoring_task where station_id = %d and status = 'Done' and end_time like '%s%%'" % (
+            curstation_id, today)
+        done_count = db.RetrieveData(sql)[0]['count(*)']
+        # 获取未完成的任务数
+        sql = "select count(*) from monitoring_task where station_id = %d and status = 'Undone'" % curstation_id
+        undone_count = db.RetrieveData(sql)[0]['count(*)']
+
+        data_list = []
+        data_list.append(user_count)
+        data_list.append(done_count)
+        data_list.append(undone_count)
+        return jsonify(
+            {
+                'code': 200,
+                'data': {
+                    'dataList': data_list
+                }
+            }
+        )
+
+    def get_right_chart_data(self, db: CrudDb, request):
+        all_data = request.get_json()
+        station_id = all_data['station_id']
+        quantity_series = []
+        # 随机生成10个数据
+        for i in range(10):
+            quantity_series.append(
+                random.randint(2, 4)
+            )
+
+        return jsonify(
+            {
+                'code': 200,
+                'data': {
+                    'dataQuantityList': quantity_series,
+                }
+            }
+        )

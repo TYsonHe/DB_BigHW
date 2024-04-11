@@ -193,7 +193,7 @@ export default {
       const endIndex = startIndex + this.pageSize
       if (this.formInline.name.trim()) {
         return this.monitoring_taskList.filter(item => {
-          const nameMatch = !this.formInline.name.trim() || item.station_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
+          const nameMatch = !this.formInline.name.trim() || item.monitoring_task_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
           return nameMatch
         })
       }

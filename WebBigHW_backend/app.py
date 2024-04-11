@@ -214,7 +214,24 @@ def acceptMonitorTask():
     return MonitoringMission().accept_monitor_task(db, request)
 
 
+@app.route('/monitor_task/getAllMonitorTaskCount', methods=['GET'])
+def getAllMonitorTaskCount():
+    return MonitoringMission().get_all_task_count(db)
+
+
+@app.route('/monitor_task/getMiddleChartData', methods=['POST'])
+def getMiddleChartData():
+    return MonitoringMission().get_middle_chart_data(db, request)
+
+
+@app.route('/monitor_task/getRightChartData', methods=['POST'])
+def getRightChartData():
+    return MonitoringMission().get_right_chart_data(db, request)
+
+
 # 站点物种数量观察页面
+
+
 @app.route('/station_species_management/get_station_species_list', methods=['GET'])
 def get_station_species_list():
     return Station_species().get_station_species_list(db, request)

@@ -1,7 +1,7 @@
 <!--接受监控任务页面 user使用-->
 <template>
-  <el-row>
-    <el-col :span="24">
+  <div class="parent">
+    <div class="div1">
       <el-card class="box-card">
         <el-row :gutter="20" style="margin-bottom: 15px">
           <el-col :span="6">
@@ -20,78 +20,92 @@
             <el-button type="success" icon="el-icon-plus" @click="acceptBtn">接受</el-button>
           </el-col>
         </el-row>
-        <!--展示表格-->
-        <el-table
-          ref="monitoring_taskTable"
-          :data="currentPageData"
-          border
-          stripe
-          style="width: 100%"
-        >
-          <el-table-column
-            type="selection"
-            width="55"
-          />
-          <el-table-column
-            prop="monitoring_task_id"
-            label="任务id"
-            align="center"
-          />
-          <el-table-column
-            prop="monitoring_task_name"
-            label="任务名"
-            align="center"
-          />
-          <el-table-column
-            prop="station_id"
-            label="观测站id"
-            align="center"
-          />
-          <el-table-column
-            prop="start_time"
-            label="开始时间"
-            align="center"
-          />
-          <el-table-column
-            prop="end_time"
-            label="结束时间"
-            align="center"
-          />
-          <el-table-column
-            prop="status"
-            label="状态"
-            align="center"
-            :filters="[{ text: 'Undone', value: 'Undone' }, { text: 'Done', value: 'Done'}
-            ]"
-            :filter-method="filterTag"
-            filter-placement="bottom-end"
-          >
-            <template slot-scope="scope">
-              <!--根据tag值来选择颜色-->
-              <el-tag
-                :type="ChooseType(scope.row.status)"
-                disable-transitions
-              >{{ scope.row.status }}
-              </el-tag>
-            </template>
-            />
-          </el-table-column>
-        </el-table>
-        <el-footer style="height: 25px;">
-          <div class="block" style="text-align: right;margin-right: 50px;">
-            <el-pagination
-              :current-page="currentPage"
-              :page-sizes="[5,10, 20, 30, 40]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="monitoring_taskList.length"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-            />
-          </div>
-        </el-footer>
       </el-card>
-    </el-col>
+    </div>
+    <el-card class="div2">
+      <div class="databoard">
+        <span style="font-weight: bold; font-size: 24px;">任务总量</span>
+        <dv-digital-flop :config="config1" />
+      </div>
+    </el-card>
+    <el-card class="div3">
+      <middle_chart v-if="waitforReady" :cur-station-id="curStation" />
+    </el-card>
+    <el-card class="div4">
+      <right_chart :cur-station-id="curStation" />
+    </el-card>
+    <el-card class="div5">
+      <!--展示表格-->
+      <el-table
+        ref="monitoring_taskTable"
+        :data="currentPageData"
+        border
+        stripe
+        style="width: 100%"
+      >
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column
+          prop="monitoring_task_id"
+          label="任务id"
+          align="center"
+        />
+        <el-table-column
+          prop="monitoring_task_name"
+          label="任务名"
+          align="center"
+        />
+        <el-table-column
+          prop="station_id"
+          label="观测站id"
+          align="center"
+        />
+        <el-table-column
+          prop="start_time"
+          label="开始时间"
+          align="center"
+        />
+        <el-table-column
+          prop="end_time"
+          label="结束时间"
+          align="center"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          align="center"
+          :filters="[{ text: 'Undone', value: 'Undone' }, { text: 'Done', value: 'Done'}
+          ]"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+        >
+          <template slot-scope="scope">
+            <!--根据tag值来选择颜色-->
+            <el-tag
+              :type="ChooseType(scope.row.status)"
+              disable-transitions
+            >{{ scope.row.status }}
+            </el-tag>
+          </template>
+          />
+        </el-table-column>
+      </el-table>
+      <el-footer style="height: 25px;">
+        <div class="block" style="text-align: right;margin-right: 50px;">
+          <el-pagination
+            :current-page="currentPage"
+            :page-sizes="[5,10, 20, 30, 40]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="monitoring_taskList.length"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </el-footer>
+    </el-card>
     <!--接受弹窗-->
     <el-dialog
       center
@@ -105,7 +119,7 @@
           <el-input v-model="updateMonitoringTaskForm.monitoring_task_id" disabled />
         </el-form-item>
         <el-form-item label="任务名" prop="monitoring_task_name">
-          <el-input v-model="updateMonitoringTaskForm.monitoring_task_name" disabled/>
+          <el-input v-model="updateMonitoringTaskForm.monitoring_task_name" disabled />
         </el-form-item>
         <el-form-item label="所属站点id" prop="station_id">
           <el-input v-model="updateMonitoringTaskForm.station_id" disabled />
@@ -117,8 +131,7 @@
               :key="item.species_id"
               :label="item.species_id+ ' ' + item.species_name"
               :value="item.species_id"
-            >
-            </el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="该物种数量">
@@ -136,21 +149,28 @@
         <el-button type="primary" @click="updateSubmit">确 定</el-button>
       </span>
     </el-dialog>
-  </el-row>
+  </div>
 </template>
 
 <script>
-import { getMonitorTaskListByRole, acceptMonitorTask } from '@/api/monitor_mission_management/accept_monitor_task'
+import { getMonitorTaskListByRole, acceptMonitorTask, getAllMonitorTaskCount } from '@/api/monitor_mission_management/accept_monitor_task'
 import { getAllSpecies } from '@/api/species_management/species_management'
+
+import right_chart from '@/views/MonitorMissionManagement/right_chart.vue'
+import middle_chart from '@/views/MonitorMissionManagement/middle_chart.vue'
 
 export default {
   name: 'SysAcceptMonitoringTask',
+  components: {
+    right_chart,
+    middle_chart
+  },
   data() {
     return {
       currentPage: 1,
       pageSize: 6,
       curRole: '', // 当前用户的角色
-      curStation: '', // 当前用户所在的观测站
+      curStation: 0, // 当前用户所在的观测站
       formInline: {
         name: ''
       },
@@ -165,7 +185,12 @@ export default {
         is_done: ''
       },
       monitoring_taskList: [],
-      speciesList: []
+      speciesList: [],
+      config1: {
+        number: [],
+        content: '{nt}个'
+      },
+      waitforReady: false
     }
   },
   computed: {
@@ -174,7 +199,7 @@ export default {
       const endIndex = startIndex + this.pageSize
       if (this.formInline.name.trim()) {
         return this.monitoring_taskList.filter(item => {
-          const nameMatch = !this.formInline.name.trim() || item.station_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
+          const nameMatch = !this.formInline.name.trim() || item.monitoring_task_name.toLowerCase().includes(this.formInline.name.trim().toLowerCase())
           return nameMatch
         })
       }
@@ -184,11 +209,21 @@ export default {
   created() {
     this.getMonitoringTaskList()
     this.getSpeciesList()
+    this.getMonitoringTaskCount()
+  },
+  mounted() {
+    this.waitforReady = true
+    // 轮询
+    this.timer = setInterval(() => {
+      this.getMonitoringTaskCount()
+    }, 10000)
+  },
+  beforeDestroy() {
+    clearInterval(this.timer)
   },
   methods: {
     async getMonitoringTaskList() {
       await getMonitorTaskListByRole().then(response => {
-        console.log(response)
         this.monitoring_taskList = response.data.task_list
         this.curRole = response.data.user_role
         this.curStation = response.data.station_id
@@ -196,8 +231,13 @@ export default {
     },
     async getSpeciesList() {
       await getAllSpecies().then(response => {
-        console.log(response)
         this.speciesList = response.data
+      })
+    },
+    async getMonitoringTaskCount() {
+      await getAllMonitorTaskCount().then(response => {
+        this.config1.number = [response.data.task_count]
+        this.config1 = { ...this.config1 }
       })
     },
     onRefresh() {
@@ -276,5 +316,40 @@ export default {
 }
 </script>
 <style scoped>
+.parent {
+  margin-left: 10px;
+  margin-right: 10px;
+display: grid;
+grid-template-columns: repeat(6, 1fr);
+grid-template-rows: 0.4fr 1fr repeat(2, 1fr);
+grid-column-gap: 0px;
+grid-row-gap: 0px;
+}
+
+.div1 { grid-area: 1 / 1 / 2 / 7; }
+.div2 { grid-area: 2 / 1 / 3 / 3;
+margin-top: 10px;
+  margin-left: 10px;
+}
+.div3 { grid-area: 2 / 3 / 3 / 5;
+  margin-left: 10px;
+margin-top: 10px;
+}
+.div4 { grid-area: 2 / 5 / 3 / 7;
+  margin-left: 10px;
+margin-top: 10px;
+}
+.div5 { grid-area: 3 / 1 / 5 / 7;
+margin-top: 10px;}
+
+.databoard {
+  margin-top: 20px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+  height: 100%;
+  width: 100%;
+}
 </style>
 
