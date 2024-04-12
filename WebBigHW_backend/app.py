@@ -9,6 +9,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from monitoring_mission import MonitoringMission
+from alert_task import Alert_task
 from station import Station
 from species import Species
 from user import User
@@ -201,7 +202,7 @@ def deleteMonitoringTask():
     all_data = request.get_json()
     return MonitoringMission().delete_mission(db, all_data)
 
-# 接受任务界面
+# 接受监控任务界面
 
 
 @app.route('/monitor_task/getMonitorTaskListByRole', methods=['GET'])
@@ -228,6 +229,38 @@ def getMiddleChartData():
 def getRightChartData():
     return MonitoringMission().get_right_chart_data(db, request)
 
+# alert_task_management区域
+# 报警任务界面，只有一个界面
+
+
+@app.route('/alert_task/getAlertTaskListByRole', methods=['GET'])
+def getAlertTaskListByRole():
+    return Alert_task().get_alert_task_by_role(db, request)
+
+
+@app.route('/alert_task/acceptAlertTask', methods=['POST'])
+def acceptAlertTask():
+    return Alert_task().accept_alert_task(db, request)
+
+
+@app.route('/alert_task/getAllAlertTaskCount', methods=['GET'])
+def getAllTaskCount():
+    return Alert_task().get_all_task_count(db)
+
+
+@app.route('/alert_task/getMiddleChartData', methods=['POST'])
+def getAlertMiddleChartData():
+    return Alert_task().get_middle_chart_data(db, request)
+
+
+@app.route('/alert_task/getRightChartData', methods=['POST'])
+def getAlertRightChartData():
+    return Alert_task().get_right_chart_data(db, request)
+
+
+@app.route('/alert_task/generateAlertTask', methods=['GET'])
+def generateAlertTask():
+    return Alert_task().generate_alert_task(db)
 
 # 站点物种数量观察页面
 

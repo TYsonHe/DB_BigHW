@@ -237,6 +237,17 @@ export const asyncRoutes = [
     }]
   },
   {
+    path: '/check_alert_task',
+    component: Layout,
+    redirect: '/check_alert_task',
+    children: [{
+      path: 'index',
+      name: '接受预警任务',
+      component: () => import('@/views/AlertTaskManagement/check_alert_task.vue'),
+      meta: { title: '接受预警任务', icon: '接受预警任务', roles: ['user'] }
+    }]
+  },
+  {
     path: '/station_species_management',
     component: Layout,
     redirect: '/station_species_management',
