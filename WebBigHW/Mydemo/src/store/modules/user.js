@@ -6,7 +6,7 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: '',
+    avatar: '@/assets/avatar/avatar.jpg',
     roles: []
   }
 }
@@ -59,7 +59,7 @@ const actions = {
         const { name, avatar, roles } = data[0]
 
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_AVATAR', '@/assets/avatar/avatar.jpg')
         commit('SET_ROLES', roles)
         console.log('user_role', roles)
         resolve(response)

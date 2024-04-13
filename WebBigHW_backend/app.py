@@ -88,7 +88,28 @@ def user_info():
     )
 
 
+@app.route('/navbar/user/role', methods=['GET'])
+def get_navbar_user_role():
+    # 获取token
+    token = request.headers.get('X-Token')
+    # 根据token获取用户名
+    decoded_token = decode_token(token)
+    print(decoded_token)
+    username = decoded_token['sub']
+    sql = "select * from user_info where user_name = '%s'" % username
+    result = db.RetrieveData(sql)
+    print(result)
+    temp = result[0]['roles']
+    return jsonify(
+        {
+            'code': 200,
+            'data': temp
+        }
+    )
+
 # user_management区域
+
+
 @app.route('/user/all', methods=['GET'])
 def user_all():
     return User().get_all_users(db)
@@ -260,7 +281,7 @@ def getAlertRightChartData():
 
 @app.route('/alert_task/generateAlertTask', methods=['GET'])
 def generateAlertTask():
-    return Alert_task().generate_alert_task(db,request)
+    return Alert_task().generate_alert_task(db, request)
 
 # 站点物种数量观察页面
 

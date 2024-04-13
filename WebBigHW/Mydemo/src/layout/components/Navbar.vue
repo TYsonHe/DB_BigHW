@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="avatarsrc+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -16,12 +16,12 @@
               Home
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
+          <!--          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">-->
+          <!--            <el-dropdown-item>Github</el-dropdown-item>-->
+          <!--          </a>-->
+          <!--          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">-->
+          <!--            <el-dropdown-item>Docs</el-dropdown-item>-->
+          <!--          </a>-->
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
@@ -35,11 +35,17 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { getUserRole } from '@/api/navbar'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger
+  },
+  data() {
+    return {
+      avatarsrc: null
+    }
   },
   computed: {
     ...mapGetters([
@@ -47,7 +53,20 @@ export default {
       'avatar'
     ])
   },
+  mounted() {
+    this.getUserRole()
+  },
   methods: {
+    getUserRole() {
+      getUserRole().then(response => {
+        const userRole = response.data
+        if (userRole === 'admin') {
+          this.avatarsrc = require('@/assets/avatar/admin.svg')
+        } else {
+          this.avatarsrc = require('@/assets/avatar/user.svg')
+        }
+      })
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },

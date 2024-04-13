@@ -14,10 +14,10 @@ export default {
 
 <style scoped>
   .mapCls{
-    width: 100%;
-    height: 1000px;
+    width: 550px;
+    height: 550px;
     //background-image: url(./bg.png);
     //background-size: 100% 100%;
-    background-repeat: no-repeat;
+    //background-repeat: no-repeat;
   }
 </style>
