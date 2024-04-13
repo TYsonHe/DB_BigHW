@@ -30,7 +30,7 @@ export default {
     // 轮询刷新
     this.timer = setInterval(() => {
       this.fetchRates()
-    }, 2000)
+    }, 1000)
   },
   methods: {
     fetchRates() {

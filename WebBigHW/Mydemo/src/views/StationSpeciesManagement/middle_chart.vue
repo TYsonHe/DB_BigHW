@@ -93,6 +93,6 @@ export default {
 <style scoped>
 #chartContainer2 {
   width: 100%;
-  height: 120px;
+  height: 200px;
 }
 </style>

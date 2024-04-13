@@ -260,7 +260,7 @@ def getAlertRightChartData():
 
 @app.route('/alert_task/generateAlertTask', methods=['GET'])
 def generateAlertTask():
-    return Alert_task().generate_alert_task(db)
+    return Alert_task().generate_alert_task(db,request)
 
 # 站点物种数量观察页面
 

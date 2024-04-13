@@ -139,17 +139,12 @@
               :key="item.species_id"
               :label="item.species_id+ ' ' + item.species_name"
               :value="item.species_id"
+              disabled
             />
           </el-select>
         </el-form-item>
         <el-form-item label="该物种数量">
           <el-input v-model="updateAlertTaskForm.quantity" />
-        </el-form-item>
-        <el-form-item label="是否完成" prop="is_done">
-          <el-radio-group v-model="updateAlertTaskForm.is_done">
-            <el-radio label="Undone">未完成</el-radio>
-            <el-radio label="Done">已完成</el-radio>
-          </el-radio-group>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -189,8 +184,7 @@ export default {
         station_id: '',
         start_time: '',
         species_id: '',
-        quantity: '',
-        is_done: ''
+        quantity: ''
       },
       alert_taskList: [],
       speciesList: [],
@@ -258,7 +252,7 @@ export default {
           message: response.message,
           type: 'info'
         })
-        this.getAlertTaskList()
+        this.getAlertTaskList() // 重新获取数据
       })
     },
     handleSizeChange(val) {
@@ -315,8 +309,7 @@ export default {
         station_id: '',
         start_time: '',
         species_id: '',
-        quantity: '',
-        is_done: ''
+        quantity: ''
       }
     },
     filterTag(value, row) {

@@ -266,7 +266,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'test for roles',
         component: () => import('@/views/BigScreen/index'),
-        meta: { title: '用户看到的', icon: 'form', roles: ['user'] }
+        meta: { title: '数据大屏', icon: '数据大屏', roles: ['user'] }
       }
     ]
   },

@@ -20,14 +20,14 @@
     <el-card class="div2">
       <div class="databoard">
         <span>物种总量</span>
-        <dv-digital-flop :config="config1" style="width:200px;height:50px;" />
+        <dv-digital-flop :config="config1"/>
       </div>
     </el-card>
     <el-card class="div3">
       <middle_chart :cur-station-id="curStationId" />
     </el-card>
     <el-card class="div4">
-      <dv-scroll-board :config="config2" style="width:420px;height:130px;color: #303031" />
+      <dv-scroll-board :config="config2" style="width:420px;height:200px;color: #303031" />
     </el-card>
     <div class="div5">
       <el-col :span="24">
