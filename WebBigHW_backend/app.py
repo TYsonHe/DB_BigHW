@@ -14,6 +14,7 @@ from station import Station
 from species import Species
 from user import User
 from station_species import Station_species
+from bigscreen import Bigscreen
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'Tyson'  # 使用一个安全的密钥
@@ -304,6 +305,12 @@ def get_station_species_quantity_total():
 @app.route('/station_species_management/get_station_species_quantity_rank', methods=['POST'])
 def get_station_species_quantity_rank():
     return Station_species().get_station_species_quantity_rank(db, request)
+
+
+# 大屏展示区域
+@app.route('/bigscreen/downscroll', methods=['GET'])
+def getScrollDownData():
+    return Bigscreen().get_scoll_down_data(db)
 
 
 if __name__ == '__main__':
