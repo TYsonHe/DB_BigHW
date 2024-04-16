@@ -7,20 +7,28 @@
       </div>
     </div>
     <div class="div2">
-      <dv-scroll-board :config="scroll1" style="height: 95%;margin-left:5px;"/>
+      <dv-scroll-board :config="scroll1" style="height: 95%;margin-left:5px;" />
     </div>
-    <div class="div3" />
-    <div class="div4" />
+    <div class="div3">
+      <upChart />
+    </div>
+    <div class="div4">
+      <downChart />
+    </div>
   </div>
 </template>
 
 <script>
 import EchartMapShow from './mapPage/echartMapShow'
 import { getBigScreenDownScrollData } from '@/api/bigscreen/bigscreen'
+import upChart from '@/views/BigScreen/upChart.vue'
+import downChart from '@/views/BigScreen/downChart.vue'
 export default {
   name: 'BigScreen',
   components: {
-    EchartMapShow
+    EchartMapShow,
+    upChart,
+    downChart
   },
 
   data() {

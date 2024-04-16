@@ -53,3 +53,57 @@ class Bigscreen:
                 'data': all_data
             }
         )
+
+    def get_species_number(self, db: CrudDb):
+        '''
+        获取物种数量
+        '''
+        # 获取species表中的物种数量
+        sql = "select count(*) from species"
+        species_number = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': species_number[0]['count(*)']
+            }
+        )
+
+    def get_species_count(self, db: CrudDb):
+        '''
+        获取物种数量总数
+        '''
+        # 获取species表中的物种数量
+        sql = "select sum(quantity) as total_quantity from species_records"
+        species_count = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': species_count[0]['total_quantity']
+            }
+        )
+
+    def get_monitoring_task_cnt(self, db: CrudDb):
+        '''
+        获取monitoring task的数量
+        '''
+        sql = "select count(*) from monitoring_task"
+        monitoring_task_cnt = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': monitoring_task_cnt[0]['count(*)']
+            }
+        )
+
+    def get_alert_task_cnt(self, db: CrudDb):
+        '''
+        获取alert task的数量
+        '''
+        sql = "select count(*) from alert_task"
+        alert_task_cnt = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': alert_task_cnt[0]['count(*)']
+            }
+        )

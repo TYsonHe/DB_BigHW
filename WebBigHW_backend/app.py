@@ -313,5 +313,25 @@ def getScrollDownData():
     return Bigscreen().get_scoll_down_data(db)
 
 
+@app.route('/bigscreen/speciesnumber', methods=['GET'])
+def getSpeciesNumber():
+    return Bigscreen().get_species_number(db)
+
+
+@app.route('/bigscreen/allspeciescount', methods=['GET'])
+def getSpeciesCount():
+    return Bigscreen().get_species_count(db)
+
+
+@app.route('/bigscreen/allmonitoringtaskcount', methods=['GET'])
+def getMonitoringTaskCnt():
+    return Bigscreen().get_monitoring_task_cnt(db)
+
+
+@app.route('/bigscreen/allalerttaskcount', methods=['GET'])
+def getAlertTaskCnt():
+    return Bigscreen().get_alert_task_cnt(db)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
