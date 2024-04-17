@@ -34,3 +34,17 @@ export function getAllalertTaskCount() {
     method: 'get'
   })
 }
+
+export function getUpUpChartData() {
+  return request({
+    url: '/bigscreen/upupchart',
+    method: 'get'
+  })
+}
+
+export function getUpDownChartData() {
+  return request({
+    url: '/bigscreen/updownchart',
+    method: 'get'
+  })
+}

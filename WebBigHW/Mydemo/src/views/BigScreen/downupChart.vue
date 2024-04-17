@@ -24,7 +24,7 @@ export default {
     // 每隔5秒更新一次数据
     this.timer = setInterval(() => {
       this.updateData()
-    }, 5000)
+    }, 10000)
   },
   beforeDestroy() {
     clearInterval(this.timer)
@@ -35,14 +35,12 @@ export default {
       // 要求，整数，范围在10000-20000之间
       for (let i = 0; i < 30; i++) {
         // 定义变量
-        let randomNum = 425.5 + Math.floor(Math.random() * 10) / 10
+        let randomNum = 5 + Math.floor(Math.random() * 10) / 10
         randomNum -= Math.floor(Math.random() * 10) / 10
-        if (i < 26) {
-          this.monitorSeriesData.push(randomNum * 10000)
-        }
+        this.monitorSeriesData.push(randomNum)
         randomNum -= Math.floor(Math.random() * 10) / 10
         randomNum += Math.floor(Math.random() * 10) / 10
-        this.predictSeriesData.push(randomNum * 10000)
+        this.predictSeriesData.push(randomNum)
       }
       // 横轴时间数据
       // 先取当前时间
@@ -64,9 +62,8 @@ export default {
       this.chart = echarts.init(this.$refs.chart)
 
       this.chart.setOption({
-        // 不显示网格
         title: {
-          text: '全国流量监控与预测',
+          text: '监控任务情况',
           textStyle: {
             fontSize: 15,
             color: 'rgba(120, 178, 218, 1)'
@@ -74,7 +71,7 @@ export default {
           left: 'center'
         },
         legend: {
-          data: ['监控流量', '预测流量'],
+          data: ['任务完成', '任务未完成'],
           textStyle: {
             color: '#b1cee2'
           },
@@ -93,9 +90,7 @@ export default {
         },
         yAxis: {
           type: 'value',
-          name: '流量（请求量）',
-          min: 4200000,  // 设置最小值
-          max: 4300000,  // 设置最大值
+          name: '数量',
           axisLine: {
             lineStyle: {
               color: '#b1cee2'
@@ -103,14 +98,14 @@ export default {
           }
         },
         grid: {
-          top: '50px',
-          left: '70px',
-          right: '10px',
-          bottom: '50px'
+          left: '1%',
+          right: '5%',
+          bottom: '10%',
+          containLabel: true
         },
         series: [
           {
-            name: '监控流量',
+            name: '任务完成',
             type: 'line',
             data: this.monitorSeriesData,
             smooth: true,
@@ -119,7 +114,7 @@ export default {
             }
           },
           {
-            name: '预测流量',
+            name: '任务未完成',
             type: 'line',
             data: this.predictSeriesData,
             smooth: true,
@@ -132,7 +127,7 @@ export default {
     },
     updateData() {
       // 模拟获取最新的监控数据和预测数据
-      const newMonitorData = 425.5 + Math.floor(Math.random() * 10) / 10 - Math.floor(Math.random() * 10) / 10
+      const newMonitorData = 5 + Math.floor(Math.random() * 10) / 10 - Math.floor(Math.random() * 10) / 10
       const newPredictData = newMonitorData - Math.floor(Math.random() * 10) / 10 + Math.floor(Math.random() * 10) / 10
 
       // 更新横轴时间数据
@@ -150,15 +145,10 @@ export default {
       if (this.monitorSeriesData[this.monitorSeriesData.length - 1] === null) {
         this.monitorSeriesData.pop()
       }
-      this.monitorSeriesData.push(newMonitorData * 10000)
+      this.monitorSeriesData.push(newMonitorData)
 
       // 更新预测流量数据
-      this.predictSeriesData.push(newPredictData * 10000)
-
-      // 在monitorSeriesData末尾补齐null, 使得数据长度一致
-      if (this.monitorSeriesData.length < 30) {
-        this.monitorSeriesData.push(null)
-      }
+      this.predictSeriesData.push(newPredictData)
 
       // 只保留最近15分钟的数据，超过15分钟则删除最旧的数据
       if (this.xAxisData.length > 30) {
@@ -174,11 +164,11 @@ export default {
         },
         series: [
           {
-            name: '监控流量',
+            name: '任务完成',
             data: this.monitorSeriesData
           },
           {
-            name: '预测流量',
+            name: '任务未完成',
             data: this.predictSeriesData
           }
         ]

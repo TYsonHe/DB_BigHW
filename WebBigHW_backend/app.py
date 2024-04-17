@@ -333,5 +333,15 @@ def getAlertTaskCnt():
     return Bigscreen().get_alert_task_cnt(db)
 
 
+@app.route('/bigscreen/upupchart', methods=['GET'])
+def getUpUpChartData():
+    return Bigscreen().get_up_up_chart_data(db)
+
+
+@app.route('/bigscreen/updownchart', methods=['GET'])
+def getUpDownChartData():
+    return Bigscreen().get_up_down_chart_data(db)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

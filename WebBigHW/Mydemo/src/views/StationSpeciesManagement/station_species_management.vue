@@ -19,7 +19,7 @@
     </div>
     <el-card class="div2">
       <div class="databoard">
-        <span>物种总量</span>
+        <span>物种记录量</span>
         <dv-digital-flop :config="config1"/>
       </div>
     </el-card>
@@ -121,7 +121,7 @@ export default {
       title: '站点编号',
       config1: {
         number: [],
-        content: '{nt}亿个'
+        content: '{nt}个'
       },
       config2: {
         title: '物种数量',
@@ -157,10 +157,10 @@ export default {
     // 设置两个轮询
     this.timer1 = setInterval(() => {
       this.getRank()
-    }, 3000)
+    }, 10000)
     this.timer2 = setInterval(() => {
       this.getTotal()
-    }, 3000)
+    }, 10000)
   },
   beforeDestroy() {
     clearInterval(this.timer1)

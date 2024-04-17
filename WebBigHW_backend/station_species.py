@@ -74,30 +74,81 @@ class Station_species:
         )
 
     def get_station_species_quantity_total(self, db: CrudDb, request):
-        all_data = request.get_json()
-        station_id = all_data['station_id']
-        # 获取物种总数
-        sql = "select count(*) from species_records where station_id = %d" % station_id
+        # 获取token
+        token = request.headers['X-Token']
+        # 解析token
+        user_info = decode_token(token)
+        # 获取用户名
+        user_name = user_info['sub']
+        # 获取用户信息
+        sql = "select * from user_info where user_name = '%s'" % user_name
         result = db.RetrieveData(sql)
-        num = random.randint(700, 1000)
-        return jsonify(
-            {
-                'code': 200,
-                'data': {
-                    'total': num
-                }
-            })
+        # 获取用户角色,观测站id
+        user_role = result[0]['roles']
+        station_id = result[0]['station_id']
+        # 如果是管理员
+        if user_role == 'admin':
+            # 获取物种总数
+            sql = "select count(*) from species_records"
+            result = db.RetrieveData(sql)
+            num = result[0]['count(*)']
+            return jsonify(
+                {
+                    'code': 200,
+                    'data': {
+                        'total': num
+                    }
+                })
+        else:
+            # 获取物种总数
+            sql = "select count(*) from species_records where station_id = %d" % station_id
+            result = db.RetrieveData(sql)
+            num = result[0]['count(*)']
+            return jsonify(
+                {
+                    'code': 200,
+                    'data': {
+                        'total': num
+                    }
+                })
 
     def get_station_species_quantity_rank(self, db: CrudDb, request):
-        all_data = request.get_json()
-        station_id = all_data['station_id']
+        # 获取token
+        token = request.headers['X-Token']
+        # 解析token
+        user_info = decode_token(token)
+        # 获取用户名
+        user_name = user_info['sub']
+        # 获取用户信息
+        sql = "select * from user_info where user_name = '%s'" % user_name
+        result = db.RetrieveData(sql)
+        # 获取用户角色,观测站id
+        user_role = result[0]['roles']
+        station_id = result[0]['station_id']
         # 获取物种数量排名
-        # 随机制作10个物种，降序排列，格式为[id,value]
+        # 如果是管理员,获取所有观测站的物种数量前10
+        # 如果是用户,获取用户所在观测站的物种数量前10
         species_list = []
-        for i in range(10):
-            species_list.append(
-                [random.randint(1, 100), random.randint(700, 1000)]
-            )
+        if user_role == 'admin':
+            sql = f"SELECT DISTINCT species_id, quantity \
+                    FROM species_records \
+                    ORDER BY quantity DESC \
+                    LIMIT 10 \
+                "
+            res = db.RetrieveData(sql)
+            for item in res:
+                species_list.append([item['species_id'], item['quantity']])
+        else:
+            sql = f"SELECT DISTINCT species_id, quantity \
+                    FROM species_records \
+                    WHERE station_id = {station_id} \
+                    ORDER BY quantity DESC \
+                    LIMIT 10 \
+                "
+            res = db.RetrieveData(sql)
+            for item in res:
+                species_list.append([item['species_id'], item['quantity']])
+
         return jsonify(
             {
                 'code': 200,

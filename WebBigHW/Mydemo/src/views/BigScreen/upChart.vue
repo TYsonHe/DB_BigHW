@@ -73,11 +73,9 @@ export default {
     async getAllSpeciesCount() {
       const res = await getAllSpeciesCount()
       if (res.code === 200) {
-        console.log(res.data)
         this.config2.number = [parseInt(res.data)]
         // 刷新datav
         this.config2 = { ...this.config2 }
-        console.log(this.config2.number)
       }
     },
     formatter(number) {

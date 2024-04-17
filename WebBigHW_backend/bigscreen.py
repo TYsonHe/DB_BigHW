@@ -107,3 +107,45 @@ class Bigscreen:
                 'data': alert_task_cnt[0]['count(*)']
             }
         )
+
+    def get_up_up_chart_data(self, db: CrudDb):
+        """
+        获取上上图表数据
+        """
+        sql = "SELECT station_id, species_id_count \
+            FROM ( \
+                SELECT station_id, species_id_count, \
+                    @row_number := @row_number + 1 AS rn \
+                FROM ( \
+                    SELECT station_id, COUNT(DISTINCT species_id) AS species_id_count \
+                    FROM species_records \
+                    GROUP BY station_id \
+                    ORDER BY species_id_count DESC \
+                ) AS counts, \
+                (SELECT @row_number := 0) AS rn_init \
+            ) AS ranked_counts \
+            WHERE rn <= 10;"
+        up_up_chart_data = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': up_up_chart_data
+            }
+        )
+
+    def get_up_down_chart_data(self, db: CrudDb):
+        """
+        获取上下图表数据
+        """
+        sql = "SELECT species_id, SUM(quantity) AS total_quantity \
+                FROM species_records \
+                GROUP BY species_id \
+                ORDER BY total_quantity DESC \
+                LIMIT 10;"
+        up_down_chart_data = db.RetrieveData(sql)
+        return jsonify(
+            {
+                'code': 200,
+                'data': up_down_chart_data
+            }
+        )

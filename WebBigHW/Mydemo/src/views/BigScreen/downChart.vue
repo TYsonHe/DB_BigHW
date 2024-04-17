@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       config: {
-        number: [100],
+        number: [],
         content: '{nt}个',
         fontSize: 30,
         color: '#fff',
@@ -40,7 +40,7 @@ export default {
         formatter: this.formatter
       },
       config2: {
-        number: [100],
+        number: [],
         content: '{nt}个',
         fontSize: 30,
         color: '#fff',

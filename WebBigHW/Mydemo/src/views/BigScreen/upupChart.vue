@@ -4,16 +4,9 @@
 </template>
 <script>
 import * as echarts from 'echarts'
-import { getMiddleChartData } from '@/api/alert_task_management/check_alert_task'
+import { getUpUpChartData } from '@/api/bigscreen/bigscreen'
 
 export default {
-  props: {
-    curStationId: {
-      // type 是 int
-      type: Number,
-      default: 0
-    }
-  },
   data() {
     return {
       dataList: []
@@ -30,16 +23,13 @@ export default {
     // 轮询刷新
     this.timer = setInterval(() => {
       this.fetchRates()
-    }, 1000)
+    }, 10000)
   },
   methods: {
     fetchRates() {
-      const post_data = {
-        station_id: this.curStationId
-      }
-      getMiddleChartData(post_data)
+      getUpUpChartData()
         .then(response => {
-          this.dataList = response.data.dataList
+          this.dataList = response.data
           this.updateChart()
         })
         .catch(error => {
@@ -51,9 +41,17 @@ export default {
     },
     updateChart() {
       this.option = {
+        title: {
+          text: '站点物种种数量数量排行Top10',
+          left: 'center',
+          textStyle: {
+            color: '#b1cee2'
+          },
+          top: 20
+        },
         xAxis: {
           type: 'category',
-          data: ['站点的人员总数', '今日已完成', '未完成的任务'],
+          data: [],
           axisTick: {
             alignWithLabel: true
           },
@@ -77,20 +75,29 @@ export default {
             type: 'shadow'
           }
         },
+        grid:
+        {
+          left: '1%',
+          right: '10%',
+          bottom: '10%',
+          containLabel: true
+        },
         series: [
           {
-            data: this.dataList,
+            data: [],
             type: 'bar',
             itemStyle: {
               color: function(params) {
-                // 在这里为每个数据项设置颜色
-                const colorList = ['#c23531', '#2f4554', '#61a0a8']
+                // 在这里为每个数据项设置颜色,设置10个颜色
+                const colorList = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570']
                 return colorList[params.dataIndex]
               }
             }
           }
         ]
       }
+      this.option.xAxis.data = this.dataList.map(item => item.station_id)
+      this.option.series[0].data = this.dataList.map(item => item.species_id_count)
       this.rightchart.setOption(this.option)
     }
   }
