@@ -255,7 +255,7 @@ export const asyncRoutes = [
       path: 'index',
       name: '站点物种信息',
       component: () => import('@/views/StationSpeciesManagement/station_species_management.vue'),
-      meta: { title: '站点物种信息', icon: '站点物种信息', roles: ['admin'] }
+      meta: { title: '站点物种信息', icon: '站点物种信息', roles: ['user'] }
     }]
   },
   {
